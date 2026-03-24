@@ -29,11 +29,10 @@
         }
         h1 { color: #4db8ff; margin-bottom: 20px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
 
-        /* 圖片容器調整為長方形，以配合完整卡片比例 */
         .image-container {
             width: 100%;
             max-width: 400px;
-            height: 550px; 
+            height: 500px; 
             margin: 0 auto 20px auto;
             border-radius: 10px;
             overflow: hidden;
@@ -42,13 +41,13 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            box-shadow: inset 0 0 20px #000;
+            border: 2px solid #3a3a50;
         }
 
         #cardImage {
             width: 100%;
             height: 100%;
-            /* 關鍵：使用 contain 確保縮放到 1.0 時能完整看到全圖 */
+            /* 始終使用 contain，確保 1.0 倍時可以看到完整邊框與卡名 */
             object-fit: contain; 
             display: none;
             transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
@@ -69,7 +68,6 @@
             box-sizing: border-box;
         }
 
-        /* 關鍵字下拉選單 */
         .suggestions-dropdown {
             position: absolute;
             top: 55px;
@@ -100,13 +98,11 @@
         #submitBtn { background-color: #4db8ff; color: #1e1e2f; flex: 2; }
         #giveUpBtn { background-color: #f44336; color: white; flex: 1; }
         #nextBtn { background-color: #4caf50; color: white; display: none; width: 100%; }
-        button:hover { opacity: 0.9; transform: translateY(-2px); }
 
         #message { margin-top: 15px; font-size: 18px; font-weight: bold; min-height: 24px; }
         .success { color: #4caf50; }
         .error { color: #ff5252; }
 
-        /* 記錄區 */
         .history-container {
             background-color: rgba(29, 29, 41, 0.95);
             padding: 20px;
@@ -114,11 +110,10 @@
             max-width: 550px;
             width: 100%;
             box-sizing: border-box;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
         }
         #guessHistoryList {
             list-style: none; padding: 0; display: flex; flex-direction: column-reverse; gap: 10px;
-            max-height: 300px; overflow-y: auto;
+            max-height: 250px; overflow-y: auto;
         }
         .history-item {
             display: flex; align-items: center; gap: 15px; padding: 10px;
@@ -135,12 +130,12 @@
     <h1>神魔之塔 猜卡片</h1>
     
     <div class="image-container">
-        <span id="loadingText">召喚圖片中...</span>
+        <span id="loadingText">載入中...</span>
         <img id="cardImage" src="" alt="卡片圖片">
     </div>
 
     <div class="controls">
-        <input type="text" id="guessInput" placeholder="輸入關鍵字尋找卡片..." autocomplete="off" disabled>
+        <input type="text" id="guessInput" placeholder="輸入卡片名稱..." autocomplete="off" disabled>
         <div id="suggestionsDropdown" class="suggestions-dropdown"></div>
         
         <div class="btn-group" id="actionButtons">
@@ -153,16 +148,16 @@
 </div>
 
 <div class="history-container">
-    <h3 style="margin: 0 0 15px 0; color: #4db8ff; font-size: 16px;">你的猜測紀錄</h3>
+    <h3 style="margin: 0 0 15px 0; color: #4db8ff; font-size: 14px;">猜測紀錄</h3>
     <ul id="guessHistoryList"></ul>
 </div>
 
 <script>
     let cardsData = [];
     let currentCard = null;
-    let initialZoom = 10.0;  // 一開始放大的幅度更高
+    let initialZoom = 8.0;   
     let currentZoom = initialZoom;
-    let zoomStep = 1.5;      // 每次猜錯縮小的幅度
+    let zoomStep = 1.2;      
     let focusX = 50, focusY = 50;
 
     const dom = {
@@ -178,19 +173,14 @@
         actionButtons: document.getElementById('actionButtons')
     };
 
-    // 補零邏輯：不足 4 位數補到 4 位 (例如 24 -> 0024)
-    function formatIconId(id) {
-        return id.toString().padStart(4, '0');
-    }
+    function formatIconId(id) { return id.toString().padStart(4, '0'); }
 
     async function loadTxtFile() {
         try {
             const response = await fetch('card_name.txt');
             const text = await response.text();
             processData(text);
-        } catch (e) {
-            dom.loadingText.innerText = "無法載入題庫，請確保使用 Python 啟動伺服器。";
-        }
+        } catch (e) { dom.loadingText.innerText = "讀取失敗，請確認伺服器運作。"; }
     }
 
     function processData(text) {
@@ -210,8 +200,6 @@
 
     function pickRandomCard() {
         currentCard = cardsData[Math.floor(Math.random() * cardsData.length)];
-        
-        // 重置 UI
         dom.cardImage.style.display = 'none';
         dom.loadingText.style.display = 'block';
         dom.message.innerText = '';
@@ -220,19 +208,18 @@
         dom.nextBtn.style.display = 'none';
         dom.actionButtons.style.display = 'flex';
 
-        // 隨機決定一個中心點 (避開極端邊緣)
-        focusX = Math.floor(Math.random() * 50) + 25; // 25% ~ 75%
-        focusY = Math.floor(Math.random() * 50) + 25; 
+        // 縮小隨機範圍 (40% ~ 60%)
+        // 因為固定用 contain 模式，中心點如果太偏，高倍率縮放時會看到側邊的黑條
+        focusX = Math.floor(Math.random() * 20) + 40; 
+        focusY = Math.floor(Math.random() * 20) + 40; 
         
         currentZoom = initialZoom;
         applyZoom();
 
-        // 大圖網址 (不強制補零)
         dom.cardImage.src = `https://d1h5mn9kk900cf.cloudfront.net/toswebsites/gallery/cards/${parseInt(currentCard.id, 10)}.jpg`;
     }
 
     function applyZoom() {
-        // 設定縮放中心點，該點會始終位於容器中心
         dom.cardImage.style.transformOrigin = `${focusX}% ${focusY}%`;
         dom.cardImage.style.transform = `scale(${currentZoom})`;
     }
@@ -244,7 +231,7 @@
 
     dom.cardImage.onerror = () => { pickRandomCard(); };
 
-    // 關鍵字輸入監聽
+    // 關鍵字搜尋與處理
     dom.guessInput.addEventListener('input', () => {
         const val = dom.guessInput.value.trim();
         dom.suggestionsDropdown.innerHTML = '';
@@ -254,79 +241,67 @@
         matches.forEach(card => {
             const div = document.createElement('div');
             div.className = 'suggestion-item';
-            const iconId = formatIconId(card.id);
             div.innerHTML = `
-                <img class="suggestion-icon" src="https://d1h5mn9kk900cf.cloudfront.net/toswebsites/gallery/icons/${iconId}.jpg" onerror="this.src='//:0'">
+                <img class="suggestion-icon" src="https://d1h5mn9kk900cf.cloudfront.net/toswebsites/gallery/icons/${formatIconId(card.id)}.jpg" onerror="this.src='//:0'">
                 <span>${card.name}</span>
             `;
             div.onclick = () => {
                 dom.guessInput.value = card.name;
                 dom.suggestionsDropdown.style.display = 'none';
-                handleGuess(card); // 點擊時傳入該卡片物件
+                handleGuess(card);
             };
             dom.suggestionsDropdown.appendChild(div);
         });
         dom.suggestionsDropdown.style.display = matches.length ? 'block' : 'none';
     });
 
-    // 處理猜測邏輯
     function handleGuess(guessedCard) {
         const isCorrect = guessedCard.name === currentCard.name;
-        
         if (isCorrect) {
-            finishGame(true, `🎉 答對了！這是「${currentCard.name}」`);
+            endGame(true, `🎉 答對了！這是「${currentCard.name}」`);
         } else {
             currentZoom = Math.max(1.0, currentZoom - zoomStep);
             applyZoom();
             dom.message.className = 'error';
-            dom.message.innerText = '❌ 猜錯了，圖片縮小了一點！';
+            dom.message.innerText = '❌ 猜錯了，圖片縮小了！';
             dom.guessInput.value = '';
         }
-        
         addHistoryRecord(guessedCard, isCorrect);
     }
 
-    function finishGame(isWin, msg) {
-        currentZoom = 1.0; // 結束時必定顯示 1.0 全圖
+    function endGame(isWin, msg) {
+        currentZoom = 1.0;
         applyZoom();
         dom.message.className = isWin ? 'success' : 'error';
         dom.message.innerText = msg;
         dom.actionButtons.style.display = 'none';
         dom.nextBtn.style.display = 'block';
-        dom.suggestionsDropdown.style.display = 'none';
     }
 
     dom.submitBtn.onclick = () => {
         const val = dom.guessInput.value.trim();
         const found = cardsData.find(c => c.name === val);
         if (found) handleGuess(found);
-        else dom.message.innerText = '⚠️ 請從下拉選單選擇正確的卡片名稱';
     };
 
-    dom.giveUpBtn.onclick = () => {
-        finishGame(false, `💡 答案是：「${currentCard.name}」`);
-    };
-
+    dom.giveUpBtn.onclick = () => endGame(false, `💡 答案是：「${currentCard.name}」`);
     dom.nextBtn.onclick = pickRandomCard;
 
-    // 新增猜測紀錄 (顯示玩家猜的那張卡)
     function addHistoryRecord(card, isCorrect) {
         const li = document.createElement('li');
         li.className = `history-item ${isCorrect ? 'correct' : 'wrong'}`;
-        const iconId = formatIconId(card.id);
         li.innerHTML = `
-            <img class="history-icon" src="https://d1h5mn9kk900cf.cloudfront.net/toswebsites/gallery/icons/${iconId}.jpg" onerror="this.src='//:0'">
+            <img class="history-icon" src="https://d1h5mn9kk900cf.cloudfront.net/toswebsites/gallery/icons/${formatIconId(card.id)}.jpg" onerror="this.src='//:0'">
             <div style="flex-grow:1">
                 <div style="font-size: 14px; font-weight: bold;">${card.name}</div>
-                <div style="font-size: 12px; opacity: 0.8;">編號: ${card.id}</div>
+                <div style="font-size: 11px; opacity: 0.8;">編號: ${card.id}</div>
             </div>
-            <div style="font-size: 20px;">${isCorrect ? '✔' : '✘'}</div>
+            <span>${isCorrect ? '✔' : '✘'}</span>
         `;
         dom.historyList.appendChild(li);
         dom.historyList.scrollTop = dom.historyList.scrollHeight;
     }
 
-    // 點擊外部關閉選單
     document.addEventListener('click', (e) => {
         if (!dom.guessInput.contains(e.target)) dom.suggestionsDropdown.style.display = 'none';
     });
