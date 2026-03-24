@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>神魔之塔 - 猜卡片遊戲</title>
+    <title>神魔之塔 - 猜卡片限時挑戰</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -17,6 +17,50 @@
             margin: 0;
             padding: 20px;
         }
+
+        /* 右上角分數板與計時器 */
+        #statusBoard {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(42, 42, 64, 0.9);
+            padding: 15px 25px;
+            border-radius: 10px;
+            border: 2px solid #4db8ff;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            text-align: right;
+        }
+        #timerText { font-size: 24px; color: #ff5252; font-weight: bold; display: block; }
+        #scoreText { font-size: 18px; color: #4db8ff; font-weight: bold; }
+        #currentRoundScore { font-size: 12px; color: #aaa; display: block; }
+
+        /* 開始與結束的彈出層 */
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .overlay-content {
+            background: #2a2a40;
+            padding: 40px;
+            border-radius: 20px;
+            border: 3px solid #4db8ff;
+            text-align: center;
+            max-width: 400px;
+        }
+        .overlay h2 { color: #4db8ff; font-size: 32px; margin-bottom: 20px; }
+        .overlay p { font-size: 18px; margin-bottom: 30px; line-height: 1.6; }
+        .start-btn {
+            background: #4caf50; color: white; padding: 15px 40px;
+            font-size: 20px; border-radius: 10px; cursor: pointer; border: none;
+        }
+
         .container {
             background-color: rgba(42, 42, 64, 0.95);
             padding: 25px;
@@ -25,76 +69,39 @@
             text-align: center;
             max-width: 550px;
             width: 100%;
-            margin-bottom: 20px;
+            margin-top: 60px;
         }
-        h1 { color: #4db8ff; margin-bottom: 20px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        h1 { color: #4db8ff; margin-bottom: 20px; }
 
         .image-container {
-            width: 100%;
-            max-width: 400px;
-            height: 500px; 
-            margin: 0 auto 20px auto;
+            width: 100%; height: 500px; 
+            margin-bottom: 20px;
             border-radius: 10px;
             overflow: hidden;
             background-color: #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            border: 2px solid #3a3a50;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; border: 2px solid #3a3a50;
         }
-
-        #cardImage {
-            width: 100%;
-            height: 100%;
-            /* 始終使用 contain，確保 1.0 倍時可以看到完整邊框與卡名 */
-            object-fit: contain; 
-            display: none;
-            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
+        #cardImage { width: 100%; height: 100%; object-fit: contain; display: none; transition: transform 0.8s; }
         #loadingText { position: absolute; font-weight: bold; }
 
         .controls { position: relative; display: flex; flex-direction: column; gap: 12px; }
-
         #guessInput {
-            padding: 14px;
-            font-size: 16px;
-            border-radius: 8px;
-            border: 2px solid #4db8ff;
-            background-color: #1e1e2f;
-            color: white;
-            width: 100%;
-            box-sizing: border-box;
+            padding: 14px; font-size: 16px; border-radius: 8px; border: 2px solid #4db8ff;
+            background-color: #1e1e2f; color: white; width: 100%; box-sizing: border-box;
         }
 
         .suggestions-dropdown {
-            position: absolute;
-            top: 55px;
-            left: 0;
-            width: 100%;
-            background-color: #2a2a40;
-            border: 1px solid #4db8ff;
-            border-radius: 8px;
-            max-height: 300px;
-            overflow-y: auto;
-            z-index: 100;
-            display: none;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+            position: absolute; top: 55px; left: 0; width: 100%;
+            background-color: #2a2a40; border: 1px solid #4db8ff; border-radius: 8px;
+            max-height: 300px; overflow-y: auto; z-index: 100; display: none;
         }
-        .suggestion-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px;
-            cursor: pointer;
-            border-bottom: 1px solid #3a3a50;
-        }
+        .suggestion-item { display: flex; align-items: center; gap: 12px; padding: 10px; cursor: pointer; border-bottom: 1px solid #3a3a50; }
         .suggestion-item:hover { background-color: #3e3e5a; }
-        .suggestion-icon { width: 45px; height: 45px; border-radius: 5px; background: #000; }
+        .suggestion-icon { width: 45px; height: 45px; border-radius: 5px; }
 
         .btn-group { display: flex; gap: 10px; }
-        button { padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; border: none; font-size: 16px; transition: 0.2s; }
+        button { padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; border: none; font-size: 16px; }
         #submitBtn { background-color: #4db8ff; color: #1e1e2f; flex: 2; }
         #giveUpBtn { background-color: #f44336; color: white; flex: 1; }
         #nextBtn { background-color: #4caf50; color: white; display: none; width: 100%; }
@@ -105,39 +112,48 @@
 
         .history-container {
             background-color: rgba(29, 29, 41, 0.95);
-            padding: 20px;
-            border-radius: 15px;
-            max-width: 550px;
-            width: 100%;
-            box-sizing: border-box;
+            padding: 20px; border-radius: 15px; max-width: 550px; width: 100%; margin-top: 20px;
         }
-        #guessHistoryList {
-            list-style: none; padding: 0; display: flex; flex-direction: column-reverse; gap: 10px;
-            max-height: 250px; overflow-y: auto;
-        }
-        .history-item {
-            display: flex; align-items: center; gap: 15px; padding: 10px;
-            background: #252538; border-radius: 8px; border-left: 5px solid #aaa;
-        }
-        .history-item.correct { border-left-color: #4caf50; background: #2e3d32; }
-        .history-item.wrong { border-left-color: #f44336; background: #3d2e2e; }
+        #guessHistoryList { list-style: none; padding: 0; display: flex; flex-direction: column-reverse; gap: 10px; max-height: 200px; overflow-y: auto; }
+        .history-item { display: flex; align-items: center; gap: 15px; padding: 10px; background: #252538; border-radius: 8px; border-left: 5px solid #aaa; }
+        .history-item.correct { border-left-color: #4caf50; }
+        .history-item.wrong { border-left-color: #f44336; }
         .history-icon { width: 40px; height: 40px; border-radius: 4px; }
     </style>
 </head>
 <body>
 
+<div id="statusBoard">
+    <span id="timerText">剩餘時間：05:00</span>
+    <span id="scoreText">總分：0</span>
+    <span id="currentRoundScore">本題價值：50</span>
+</div>
+
+<div id="startOverlay" class="overlay">
+    <div class="overlay-content">
+        <h2>限時挑戰模式</h2>
+        <p>你有 5 分鐘的時間可以挑戰！<br>每題基本 50 分，猜錯扣 5 分。<br>看你能拿到多少分？</p>
+        <button class="start-btn" onclick="initGame()">開始挑戰</button>
+    </div>
+</div>
+
+<div id="resultOverlay" class="overlay" style="display: none;">
+    <div class="overlay-content">
+        <h2>時間到！</h2>
+        <p id="finalResultText">總分：0<br>答對題數：0</p>
+        <button class="start-btn" style="background:#4db8ff" onclick="location.reload()">再玩一次</button>
+    </div>
+</div>
+
 <div class="container">
     <h1>神魔之塔 猜卡片</h1>
-    
     <div class="image-container">
         <span id="loadingText">載入中...</span>
         <img id="cardImage" src="" alt="卡片圖片">
     </div>
-
     <div class="controls">
         <input type="text" id="guessInput" placeholder="輸入卡片名稱..." autocomplete="off" disabled>
         <div id="suggestionsDropdown" class="suggestions-dropdown"></div>
-        
         <div class="btn-group" id="actionButtons">
             <button id="submitBtn" disabled>猜測</button>
             <button id="giveUpBtn" disabled>看答案</button>
@@ -155,10 +171,15 @@
 <script>
     let cardsData = [];
     let currentCard = null;
-    let initialZoom = 8.0;   
-    let currentZoom = initialZoom;
-    let zoomStep = 1.2;      
+    let initialZoom = 8.0, currentZoom = initialZoom, zoomStep = 1.2;
     let focusX = 50, focusY = 50;
+
+    // 遊戲狀態
+    let totalScore = 0;
+    let correctCount = 0;
+    let currentQuestionScore = 50;
+    let timeLeft = 300; // 5分鐘 = 300秒
+    let gameTimer = null;
 
     const dom = {
         cardImage: document.getElementById('cardImage'),
@@ -170,54 +191,84 @@
         giveUpBtn: document.getElementById('giveUpBtn'),
         message: document.getElementById('message'),
         historyList: document.getElementById('guessHistoryList'),
-        actionButtons: document.getElementById('actionButtons')
+        actionButtons: document.getElementById('actionButtons'),
+        scoreText: document.getElementById('scoreText'),
+        timerText: document.getElementById('timerText'),
+        currentRoundScore: document.getElementById('currentRoundScore'),
+        startOverlay: document.getElementById('startOverlay'),
+        resultOverlay: document.getElementById('resultOverlay'),
+        finalResultText: document.getElementById('finalResultText')
     };
 
     function formatIconId(id) { return id.toString().padStart(4, '0'); }
 
+    // 1. 載入資料
     async function loadTxtFile() {
         try {
-            // 在檔名後面加上 ?t=時間戳記，強制瀏覽器每次都抓最新版！
             const response = await fetch('card_name.txt?t=' + new Date().getTime());
             const text = await response.text();
-            processData(text);
-        } catch (e) { dom.loadingText.innerText = "讀取失敗，請確認伺服器運作。"; }
+            text.split('\n').forEach(line => {
+                const match = line.trim().match(/^(\d+)\s+(.+)$/);
+                if (match) cardsData.push({ id: match[1], name: match[2].trim() });
+            });
+        } catch (e) { dom.loadingText.innerText = "資料讀取失敗"; }
     }
 
-    function processData(text) {
-        text.split('\n').forEach(line => {
-            const match = line.trim().match(/^(\d+)\s+(.+)$/);
-            if (match) cardsData.push({ id: match[1], name: match[2].trim() });
-        });
-        if (cardsData.length > 0) startGame();
-    }
-
-    function startGame() {
+    // 2. 初始化遊戲
+    function initGame() {
+        if (cardsData.length === 0) { alert("資料尚未載入完成，請稍候。"); return; }
+        dom.startOverlay.style.display = 'none';
         dom.guessInput.disabled = false;
         dom.submitBtn.disabled = false;
         dom.giveUpBtn.disabled = false;
+        
+        startTimer();
         pickRandomCard();
     }
 
+    // 3. 計時器邏輯
+    function startTimer() {
+        gameTimer = setInterval(() => {
+            timeLeft--;
+            let mins = Math.floor(timeLeft / 60);
+            let secs = timeLeft % 60;
+            dom.timerText.innerText = `剩餘時間：${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            
+            if (timeLeft <= 0) {
+                clearInterval(gameTimer);
+                endChallenge();
+            }
+        }, 1000);
+    }
+
+    // 4. 結束挑戰
+    function endChallenge() {
+        dom.guessInput.disabled = true;
+        dom.submitBtn.disabled = true;
+        dom.giveUpBtn.disabled = true;
+        dom.resultOverlay.style.display = 'flex';
+        dom.finalResultText.innerHTML = `總分：${totalScore}<br>總共答對：${correctCount} 題`;
+    }
+
     function pickRandomCard() {
-        // 1. 從 1 到 12000 隨機抽取一個編號
         const randomId = Math.floor(Math.random() * 12000) + 1;
-        
-        // 2. 檢查此編號是否存在於題庫中 (需轉成字串比對，並考量補零的可能性)
-        // 這裡比對 id 時，我們會檢查原始 ID 或是去掉前導零後的 ID
         const foundCard = cardsData.find(c => parseInt(c.id, 10) === randomId);
+        if (!foundCard) { pickRandomCard(); return; }
 
-        // 3. 如果沒找到，就重新抽取 (遞迴)
-        if (!foundCard) {
-            console.log(`編號 ${randomId} 不存在，重新抽取中...`);
-            pickRandomCard();
-            return; 
-        }
-
-        // 4. 如果找到了，設定為當前卡片並更新 UI
         currentCard = foundCard;
-        console.log(`抽中編號: ${currentCard.id}, 名稱: ${currentCard.name}`);
+        currentQuestionScore = 50;
+        updateUI();
 
+        dom.cardImage.src = `https://d1h5mn9kk900cf.cloudfront.net/toswebsites/gallery/cards/${parseInt(currentCard.id, 10)}.jpg`;
+        focusX = Math.floor(Math.random() * 20) + 40; 
+        focusY = Math.floor(Math.random() * 20) + 40; 
+        currentZoom = initialZoom;
+        applyZoom();
+    }
+
+    function updateUI() {
+        dom.scoreText.innerText = `總分：${totalScore}`;
+        dom.currentRoundScore.innerText = `本題價值：${currentQuestionScore}`;
         dom.cardImage.style.display = 'none';
         dom.loadingText.style.display = 'block';
         dom.message.innerText = '';
@@ -225,69 +276,28 @@
         dom.historyList.innerHTML = '';
         dom.nextBtn.style.display = 'none';
         dom.actionButtons.style.display = 'flex';
-
-        // 設定縮放中心點 (40% ~ 60%)
-        focusX = Math.floor(Math.random() * 20) + 40; 
-        focusY = Math.floor(Math.random() * 20) + 40; 
-        
-        currentZoom = initialZoom;
-        applyZoom();
-
-        // 大圖網址 (使用實際編號)
-        dom.cardImage.src = `https://d1h5mn9kk900cf.cloudfront.net/toswebsites/gallery/cards/${parseInt(currentCard.id, 10)}.jpg`;
     }
-
-    function applyZoom() {
-        dom.cardImage.style.transformOrigin = `${focusX}% ${focusY}%`;
-        dom.cardImage.style.transform = `scale(${currentZoom})`;
-    }
-
-    dom.cardImage.onload = () => {
-        dom.loadingText.style.display = 'none';
-        dom.cardImage.style.display = 'block';
-    };
-
-    dom.cardImage.onerror = () => { pickRandomCard(); };
-
-    // 關鍵字搜尋與處理
-    dom.guessInput.addEventListener('input', () => {
-        const val = dom.guessInput.value.trim();
-        dom.suggestionsDropdown.innerHTML = '';
-        if (!val) { dom.suggestionsDropdown.style.display = 'none'; return; }
-
-        const matches = cardsData.filter(c => c.name.includes(val)).slice(0, 30);
-        matches.forEach(card => {
-            const div = document.createElement('div');
-            div.className = 'suggestion-item';
-            div.innerHTML = `
-                <img class="suggestion-icon" src="https://d1h5mn9kk900cf.cloudfront.net/toswebsites/gallery/icons/${formatIconId(card.id)}.jpg" onerror="this.src='//:0'">
-                <span>${card.name}</span>
-            `;
-            div.onclick = () => {
-                dom.guessInput.value = card.name;
-                dom.suggestionsDropdown.style.display = 'none';
-                handleGuess(card);
-            };
-            dom.suggestionsDropdown.appendChild(div);
-        });
-        dom.suggestionsDropdown.style.display = matches.length ? 'block' : 'none';
-    });
 
     function handleGuess(guessedCard) {
         const isCorrect = guessedCard.name === currentCard.name;
         if (isCorrect) {
-            endGame(true, `🎉 答對了！這是「${currentCard.name}」`);
+            totalScore += currentQuestionScore;
+            correctCount++;
+            endRound(true, `🎉 答對了！+${currentQuestionScore} 分`);
         } else {
+            currentQuestionScore = Math.max(0, currentQuestionScore - 5);
             currentZoom = Math.max(1.0, currentZoom - zoomStep);
             applyZoom();
+            dom.scoreText.innerText = `總分：${totalScore}`;
+            dom.currentRoundScore.innerText = `本題價值：${currentQuestionScore}`;
             dom.message.className = 'error';
-            dom.message.innerText = '❌ 猜錯了，圖片縮小了！';
+            dom.message.innerText = '❌ 猜錯了，分數扣減！';
             dom.guessInput.value = '';
         }
         addHistoryRecord(guessedCard, isCorrect);
     }
 
-    function endGame(isWin, msg) {
+    function endRound(isWin, msg) {
         currentZoom = 1.0;
         applyZoom();
         dom.message.className = isWin ? 'success' : 'error';
@@ -296,33 +306,49 @@
         dom.nextBtn.style.display = 'block';
     }
 
+    function applyZoom() {
+        dom.cardImage.style.transformOrigin = `${focusX}% ${focusY}%`;
+        dom.cardImage.style.transform = `scale(${currentZoom})`;
+    }
+
+    dom.cardImage.onload = () => { dom.loadingText.style.display = 'none'; dom.cardImage.style.display = 'block'; };
+    dom.cardImage.onerror = () => { pickRandomCard(); };
+
+    dom.guessInput.addEventListener('input', () => {
+        const val = dom.guessInput.value.trim();
+        dom.suggestionsDropdown.innerHTML = '';
+        if (!val) { dom.suggestionsDropdown.style.display = 'none'; return; }
+        const matches = cardsData.filter(c => c.name.includes(val));
+        matches.forEach(card => {
+            const div = document.createElement('div');
+            div.className = 'suggestion-item';
+            div.innerHTML = `<img class="suggestion-icon" src="https://d1h5mn9kk900cf.cloudfront.net/toswebsites/gallery/icons/${formatIconId(card.id)}.jpg" onerror="this.src='//:0'"><span>${card.name}</span>`;
+            div.onclick = () => { dom.guessInput.value = card.name; dom.suggestionsDropdown.style.display = 'none'; handleGuess(card); };
+            dom.suggestionsDropdown.appendChild(div);
+        });
+        dom.suggestionsDropdown.style.display = matches.length ? 'block' : 'none';
+    });
+
     dom.submitBtn.onclick = () => {
         const val = dom.guessInput.value.trim();
         const found = cardsData.find(c => c.name === val);
         if (found) handleGuess(found);
     };
 
-    dom.giveUpBtn.onclick = () => endGame(false, `💡 答案是：「${currentCard.name}」`);
+    dom.giveUpBtn.onclick = () => {
+        currentQuestionScore = 0;
+        endRound(false, `💡 答案是：「${currentCard.name}」`);
+    };
+
     dom.nextBtn.onclick = pickRandomCard;
 
     function addHistoryRecord(card, isCorrect) {
         const li = document.createElement('li');
         li.className = `history-item ${isCorrect ? 'correct' : 'wrong'}`;
-        li.innerHTML = `
-            <img class="history-icon" src="https://d1h5mn9kk900cf.cloudfront.net/toswebsites/gallery/icons/${formatIconId(card.id)}.jpg" onerror="this.src='//:0'">
-            <div style="flex-grow:1">
-                <div style="font-size: 14px; font-weight: bold;">${card.name}</div>
-                <div style="font-size: 11px; opacity: 0.8;">編號: ${card.id}</div>
-            </div>
-            <span>${isCorrect ? '✔' : '✘'}</span>
-        `;
+        li.innerHTML = `<img class="history-icon" src="https://d1h5mn9kk900cf.cloudfront.net/toswebsites/gallery/icons/${formatIconId(card.id)}.jpg" onerror="this.src='//:0'"><div style="flex-grow:1"><div style="font-size:14px; font-weight:bold;">${card.name}</div><div style="font-size:11px; opacity:0.8;">編號: ${card.id}</div></div><span>${isCorrect ? '✔' : '✘'}</span>`;
         dom.historyList.appendChild(li);
         dom.historyList.scrollTop = dom.historyList.scrollHeight;
     }
-
-    document.addEventListener('click', (e) => {
-        if (!dom.guessInput.contains(e.target)) dom.suggestionsDropdown.style.display = 'none';
-    });
 
     window.onload = loadTxtFile;
 </script>
