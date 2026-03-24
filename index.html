@@ -177,7 +177,8 @@
 
     async function loadTxtFile() {
         try {
-            const response = await fetch('card_name.txt');
+            // 在檔名後面加上 ?t=時間戳記，強制瀏覽器每次都抓最新版！
+            const response = await fetch('card_name.txt?t=' + new Date().getTime());
             const text = await response.text();
             processData(text);
         } catch (e) { dom.loadingText.innerText = "讀取失敗，請確認伺服器運作。"; }
