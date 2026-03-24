@@ -199,7 +199,24 @@
     }
 
     function pickRandomCard() {
-        currentCard = cardsData[Math.floor(Math.random() * cardsData.length)];
+        // 1. 從 1 到 12000 隨機抽取一個編號
+        const randomId = Math.floor(Math.random() * 12000) + 1;
+        
+        // 2. 檢查此編號是否存在於題庫中 (需轉成字串比對，並考量補零的可能性)
+        // 這裡比對 id 時，我們會檢查原始 ID 或是去掉前導零後的 ID
+        const foundCard = cardsData.find(c => parseInt(c.id, 10) === randomId);
+
+        // 3. 如果沒找到，就重新抽取 (遞迴)
+        if (!foundCard) {
+            console.log(`編號 ${randomId} 不存在，重新抽取中...`);
+            pickRandomCard();
+            return; 
+        }
+
+        // 4. 如果找到了，設定為當前卡片並更新 UI
+        currentCard = foundCard;
+        console.log(`抽中編號: ${currentCard.id}, 名稱: ${currentCard.name}`);
+
         dom.cardImage.style.display = 'none';
         dom.loadingText.style.display = 'block';
         dom.message.innerText = '';
@@ -208,14 +225,14 @@
         dom.nextBtn.style.display = 'none';
         dom.actionButtons.style.display = 'flex';
 
-        // 縮小隨機範圍 (40% ~ 60%)
-        // 因為固定用 contain 模式，中心點如果太偏，高倍率縮放時會看到側邊的黑條
+        // 設定縮放中心點 (40% ~ 60%)
         focusX = Math.floor(Math.random() * 20) + 40; 
         focusY = Math.floor(Math.random() * 20) + 40; 
         
         currentZoom = initialZoom;
         applyZoom();
 
+        // 大圖網址 (使用實際編號)
         dom.cardImage.src = `https://d1h5mn9kk900cf.cloudfront.net/toswebsites/gallery/cards/${parseInt(currentCard.id, 10)}.jpg`;
     }
 
