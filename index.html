@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>神魔之塔 - 猜卡片限時挑戰</title>
+    <title>神魔之塔 - 猜卡片挑戰</title>
     <style>
         :root {
             --primary-blue: #4db8ff;
@@ -39,7 +39,7 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             text-align: right;
             backdrop-filter: blur(5px);
-            display: none; /* 初始隱藏 */
+            display: none;
         }
         #timerText { font-size: 24px; color: var(--error-red); font-weight: bold; display: block; }
         #scoreText { font-size: 18px; color: var(--primary-blue); font-weight: bold; }
@@ -90,8 +90,8 @@
             background-color: var(--panel-bg);
             padding: 30px; border-radius: 20px; 
             box-shadow: 0 15px 35px rgba(0,0,0,0.8);
-            text-align: center; max-width: 550px; width: 100%; margin-top: 60px;
-            opacity: 0.3; pointer-events: none; /* 遊戲開始前不可點擊 */
+            text-align: center; max-width: 650px; width: 100%; margin-top: 60px;
+            opacity: 0.3; pointer-events: none;
             transition: opacity 0.5s;
         }
         .container.active { opacity: 1; pointer-events: auto; }
@@ -109,30 +109,39 @@
         .layer-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
         
         #tileGrid {
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%;
-            display: grid; 
-            /* 修改這裡：改為 3 欄 2 列 */
-            grid-template-columns: repeat(3, 1fr); 
-            grid-template-rows: repeat(2, 1fr);
-            z-index: 10; 
-            pointer-events: none;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr);
+            z-index: 10; pointer-events: none;
         }
 
-        /* 為了美觀，建議把 border 改成四周都有，更有拼圖感 */
         .tile { 
             background-color: #1a1a2e; 
             border: 1px solid rgba(255, 255, 255, 0.1); 
             transition: opacity 0.4s ease; 
-            opacity: 1; 
-            box-sizing: border-box; /* 確保邊框不會撐破網格 */
+            opacity: 1; box-sizing: border-box;
         }
         .tile.revealed { opacity: 0; }
-
         #loadingText { position: absolute; font-weight: bold; z-index: 15; color: var(--primary-blue); }
+
+        /* 資訊猜卡表格樣式 */
+        #infoModeContainer { display: none; width: 100%; margin-bottom: 20px; max-height: 500px; overflow-y: auto; }
+        .info-table { width: 100%; border-collapse: separate; border-spacing: 5px 8px; font-size: 14px; }
+        .info-table th { color: #aaa; font-weight: normal; padding-bottom: 5px; }
+        .info-table td { 
+            padding: 12px 5px; 
+            text-align: center; 
+            vertical-align: middle; 
+            border-radius: 6px;
+            background-color: var(--error-red);
+            color: white;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .info-table td.name-cell { background-color: #2a2a40; font-weight: normal; } 
+        .info-table td.match { background-color: var(--success-green) !important; }
+
+        .info-card-cell { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .info-card-cell img { width: 45px; height: 45px; border-radius: 5px; border: 1px solid #555; }
 
         .controls { position: relative; display: flex; flex-direction: column; gap: 12px; }
         #guessInput {
@@ -161,7 +170,7 @@
 
         .history-container {
             background-color: var(--panel-bg);
-            padding: 20px; border-radius: 15px; max-width: 550px; width: 100%; margin-top: 20px;
+            padding: 20px; border-radius: 15px; max-width: 650px; width: 100%; margin-top: 20px;
         }
         #guessHistoryList { list-style: none; padding: 0; display: flex; flex-direction: column-reverse; gap: 10px; max-height: 180px; overflow-y: auto; }
         .history-item { display: flex; align-items: center; gap: 15px; padding: 10px; background: #252538; border-radius: 8px; border-left: 5px solid #aaa; }
@@ -188,6 +197,7 @@
         <h2>選擇遊戲玩法</h2>
         <button class="start-btn" style="background: #e91e63;" onclick="selectGameType('zoom')">🔍 圖片縮放猜卡</button>
         <button class="start-btn" style="background: #9c27b0;" onclick="selectGameType('silhouette')">🎞️ 圖片剪影猜卡</button>
+        <button class="start-btn" style="background: #4caf50;" onclick="selectGameType('info')">📊 卡片資訊猜卡</button>
     </div>
 </div>
 
@@ -202,9 +212,19 @@
     </div>
 </div>
 
+<div id="timeSelectionOverlay" class="overlay" style="display: none;">
+    <div class="overlay-content">
+        <h2>選擇時間模式</h2>
+        <div class="mode-container">
+            <button class="start-btn mode-btn" style="background: var(--error-red); color: white;" onclick="selectTimeMode(true)">⏳ 限時挑戰<br><span style="font-size: 14px;">(5分鐘)</span></button>
+            <button class="start-btn mode-btn" style="background: var(--success-green); color: white;" onclick="selectTimeMode(false)">☕ 休閒模式<br><span style="font-size: 14px;">(無時間限制)</span></button>
+        </div>
+    </div>
+</div>
+
 <div id="startOverlay" class="overlay" style="display: none;">
     <div class="overlay-content">
-        <h2>限時挑戰規則</h2>
+        <h2>挑戰規則</h2>
         <p id="ruleDescription"></p>
         <button id="realStartBtn" class="start-btn" onclick="initGame()" disabled>正在準備中...</button>
     </div>
@@ -212,7 +232,7 @@
 
 <div id="resultOverlay" class="overlay" style="display: none;">
     <div class="overlay-content">
-        <h2>時間到！</h2>
+        <h2 id="resultTitle">時間到！</h2>
         <p id="finalResultText" style="font-size:22px;"></p>
         <button class="start-btn" style="background:var(--primary-blue)" onclick="location.reload()">再玩一次</button>
     </div>
@@ -220,13 +240,30 @@
 
 <div class="container" id="gameMainContainer">
     <h1 id="mainTitle">神魔之塔 猜卡片</h1>
-    <div class="image-container">
+    
+    <div class="image-container" id="imageContainerBlock">
         <span id="loadingText">請選擇模式</span>
         <img id="cardImage" src="" alt="卡片圖片">
         <div id="silhouetteContainer">
             <img id="colorImage" class="layer-img" src="" alt="彩色原圖">
             <div id="tileGrid"></div>
         </div>
+    </div>
+
+    <div id="infoModeContainer">
+        <table class="info-table" id="infoTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>卡片名稱</th>
+                    <th>屬性</th>
+                    <th>種族</th>
+                    <th>星級</th>
+                    <th>標籤</th>
+                </tr>
+            </thead>
+            <tbody id="infoTableBody"></tbody>
+        </table>
     </div>
     
     <div class="controls">
@@ -252,6 +289,7 @@
     let currentCard = null;
     let hiddenTiles = [];
     let selectedPlayType = 'zoom'; 
+    let isTimerEnabled = true; // 紀錄是否為限時模式
     let totalScore = 0;
     let correctCount = 0;
     let currentQuestionScore = 50;
@@ -264,6 +302,9 @@
     let focusX = 50, focusY = 50;
 
     const dom = {
+        imageContainerBlock: document.getElementById('imageContainerBlock'),
+        infoModeContainer: document.getElementById('infoModeContainer'),
+        infoTableBody: document.getElementById('infoTableBody'),
         cardImage: document.getElementById('cardImage'),
         silhouetteContainer: document.getElementById('silhouetteContainer'),
         colorImage: document.getElementById('colorImage'),
@@ -282,9 +323,11 @@
         currentRoundScore: document.getElementById('currentRoundScore'),
         gameTypeOverlay: document.getElementById('gameTypeOverlay'),
         modeSelectionOverlay: document.getElementById('modeSelectionOverlay'),
+        timeSelectionOverlay: document.getElementById('timeSelectionOverlay'), // 新增
         loadStatusText: document.getElementById('loadStatusText'),
         startOverlay: document.getElementById('startOverlay'),
         resultOverlay: document.getElementById('resultOverlay'),
+        resultTitle: document.getElementById('resultTitle'),
         finalResultText: document.getElementById('finalResultText'),
         mainTitle: document.getElementById('mainTitle'),
         ruleDescription: document.getElementById('ruleDescription'),
@@ -298,21 +341,21 @@
     function selectGameType(type) {
         selectedPlayType = type;
         dom.gameTypeOverlay.style.display = 'none';
-        dom.modeSelectionOverlay.style.display = 'flex';
         
         if(type === 'zoom') {
             dom.mainTitle.innerText = "神魔之塔 - 圖片縮放猜卡";
-            dom.ruleDescription.innerHTML = "5 分鐘挑戰！<br>每題 50 分，猜錯扣 5 分並縮小圖片。";
-        } else {
+            dom.modeSelectionOverlay.style.display = 'flex';
+        } else if (type === 'silhouette') {
             dom.mainTitle.innerText = "神魔之塔 - 圖片剪影猜卡";
-            dom.ruleDescription.innerHTML = "5 分鐘挑戰！<br>圖片分六格，初始隨機開一格。<br>猜錯扣 5 分並隨機增開一格。";
+            dom.modeSelectionOverlay.style.display = 'flex';
+        } else if (type === 'info') {
+            dom.mainTitle.innerText = "神魔之塔 - 卡片資訊猜卡";
+            loadMonsterList();
         }
     }
 
     async function selectMode(mode) {
-        // 防止重複點擊
         if (isDataLoaded) return;
-        
         dom.loadStatusText.innerText = "正在讀取卡片資料，請稍候...";
         const btns = dom.modeSelectionOverlay.querySelectorAll('button');
         btns.forEach(b => b.disabled = true);
@@ -321,23 +364,74 @@
             const response = await fetch('card_name.txt?t=' + new Date().getTime());
             if (!response.ok) throw new Error("檔案讀取失敗");
             const text = await response.text();
-            const lines = text.split('\n');
             cardsData = [];
-            lines.forEach((line) => {
+            text.split('\n').forEach((line) => {
                 const match = line.trim().match(/^(\d+)\s+(.+)$/);
                 if (match) cardsData.push({ id: match[1], name: match[2].trim() });
             });
             gameCardsPool = (mode === 'recent') ? cardsData.filter(c => parseInt(c.id, 10) > 10819) : cardsData;
-            
-            isDataLoaded = true;
-            dom.modeSelectionOverlay.style.display = 'none';
-            dom.startOverlay.style.display = 'flex';
-            dom.realStartBtn.disabled = false;
-            dom.realStartBtn.innerText = "開始挑戰";
+            finishLoading();
         } catch (e) {
             dom.loadStatusText.innerHTML = `<span style="color:red">載入失敗: ${e.message}</span>`;
             btns.forEach(b => b.disabled = false);
         }
+    }
+
+    async function loadMonsterList() {
+        try {
+            const response = await fetch('monster_list.txt?t=' + new Date().getTime());
+            if (!response.ok) throw new Error("檔案讀取失敗");
+            const text = await response.text();
+            cardsData = [];
+            
+            const regex = /id:(\d+)\s+name:(.+?)\s+attribute:(\S+)\s+race:(\S+)\s+star:(\d+)\s+first_tag:(.*)/;
+
+            text.split('\n').forEach(line => {
+                const match = line.trim().match(regex);
+                if(match) {
+                    cardsData.push({ 
+                        id: match[1], 
+                        name: match[2].trim(), 
+                        attr: match[3], 
+                        race: match[4], 
+                        star: match[5], 
+                        tag: match[6].trim()
+                    });
+                }
+            });
+            gameCardsPool = cardsData;
+            finishLoading();
+        } catch (e) {
+            alert("載入 monster_list.txt 失敗：" + e.message);
+        }
+    }
+
+    function finishLoading() {
+        isDataLoaded = true;
+        dom.modeSelectionOverlay.style.display = 'none';
+        // 載入完成後，前往選擇時間模式
+        dom.timeSelectionOverlay.style.display = 'flex';
+    }
+
+    // 選擇時間模式
+    function selectTimeMode(isTimed) {
+        isTimerEnabled = isTimed;
+        dom.timeSelectionOverlay.style.display = 'none';
+        
+        // 根據選擇的時間模式與遊戲玩法動態設定規則文字
+        let timeStr = isTimed ? "<strong style='color:var(--error-red);'>5 分鐘限時挑戰！</strong><br>" : "<strong style='color:var(--success-green);'>休閒模式（無時間限制）</strong><br>";
+        
+        if (selectedPlayType === 'zoom') {
+            dom.ruleDescription.innerHTML = timeStr + "每題 50 分，猜錯扣 5 分並縮小圖片。";
+        } else if (selectedPlayType === 'silhouette') {
+            dom.ruleDescription.innerHTML = timeStr + "圖片分六格，初始隨機開一格。<br>猜錯扣 5 分並隨機增開一格。";
+        } else if (selectedPlayType === 'info') {
+            dom.ruleDescription.innerHTML = timeStr + "根據各項資訊縮小範圍。<br>格子的顏色會告訴你該項目是否與正確答案相符！";
+        }
+
+        dom.startOverlay.style.display = 'flex';
+        dom.realStartBtn.disabled = false;
+        dom.realStartBtn.innerText = "開始挑戰";
     }
 
     function initGame() {
@@ -348,7 +442,12 @@
         dom.submitBtn.disabled = false;
         dom.giveUpBtn.disabled = false;
         
-        startTimer();
+        if (isTimerEnabled) {
+            dom.timerText.style.display = 'block';
+            startTimer();
+        } else {
+            dom.timerText.style.display = 'none'; // 休閒模式隱藏計時器
+        }
         pickRandomCard();
     }
 
@@ -367,18 +466,27 @@
         dom.guessInput.disabled = true;
         dom.submitBtn.disabled = true;
         dom.resultOverlay.style.display = 'flex';
+        dom.resultTitle.innerText = "時間到！";
         dom.finalResultText.innerHTML = `總分：${totalScore}<br>答對題數：${correctCount}`;
     }
 
     function pickRandomCard() {
         if (!gameCardsPool.length) return;
-        
         const randomIndex = Math.floor(Math.random() * gameCardsPool.length);
         currentCard = gameCardsPool[randomIndex];
         currentQuestionScore = 50;
-        
-        // 清理 UI
         updateUI();
+
+        if (selectedPlayType === 'info') {
+            dom.imageContainerBlock.style.display = 'none';
+            dom.infoModeContainer.style.display = 'block';
+            dom.infoTableBody.innerHTML = '';
+            dom.guessInput.focus();
+            return; 
+        }
+
+        dom.imageContainerBlock.style.display = 'flex';
+        dom.infoModeContainer.style.display = 'none';
         dom.cardImage.style.display = 'none';
         dom.silhouetteContainer.style.display = 'none';
         dom.loadingText.style.display = 'block';
@@ -409,11 +517,9 @@
         dom.guessInput.focus();
     }
 
-    function setupVerticalTiles() { // 保留原函數名避免報錯，或同步修改呼叫處
+    function setupVerticalTiles() { 
         dom.tileGrid.innerHTML = '';
         hiddenTiles = [];
-        
-        // 總共 3x2 = 6 格
         for (let i = 0; i < 6; i++) {
             const tile = document.createElement('div');
             tile.className = 'tile';
@@ -442,7 +548,57 @@
         dom.suggestionsDropdown.style.display = 'none';
     }
 
+    function addInfoTableRow(guessed, target) {
+        const tr = document.createElement('tr');
+        
+        const tdId = document.createElement('td');
+        const gId = parseInt(guessed.id);
+        const tId = parseInt(target.id);
+        if (gId < tId) tdId.innerText = "↑ " + guessed.id;
+        else if (gId > tId) tdId.innerText = "↓ " + guessed.id;
+        else {
+            tdId.innerText = guessed.id;
+            tdId.classList.add('match');
+        }
+        tr.appendChild(tdId);
+
+        const tdCard = document.createElement('td');
+        tdCard.className = 'name-cell';
+        tdCard.innerHTML = `<div class="info-card-cell">
+            <img src="https://d1h5mn9kk900cf.cloudfront.net/toswebsites/gallery/icons/${formatIconId(guessed.id)}.jpg">
+            <span style="line-height:1.2;">${guessed.name}</span>
+        </div>`;
+        tr.appendChild(tdCard);
+
+        const tdAttr = document.createElement('td');
+        tdAttr.innerText = guessed.attr;
+        if (guessed.attr === target.attr) tdAttr.classList.add('match');
+        tr.appendChild(tdAttr);
+
+        const tdRace = document.createElement('td');
+        tdRace.innerText = guessed.race;
+        if (guessed.race === target.race) tdRace.classList.add('match');
+        tr.appendChild(tdRace);
+
+        const tdStar = document.createElement('td');
+        tdStar.innerText = guessed.star;
+        if (guessed.star === target.star) tdStar.classList.add('match');
+        tr.appendChild(tdStar);
+
+        const tdTag = document.createElement('td');
+        tdTag.innerText = guessed.tag || '無';
+        if (guessed.tag === target.tag) tdTag.classList.add('match');
+        tr.appendChild(tdTag);
+
+        dom.infoTableBody.appendChild(tr);
+        dom.infoModeContainer.scrollTop = dom.infoModeContainer.scrollHeight;
+    }
+
     function handleGuess(guessedCard) {
+        if (selectedPlayType === 'info') {
+            addInfoTableRow(guessedCard, currentCard);
+        }
+
         if (guessedCard.name === currentCard.name) {
             totalScore += currentQuestionScore;
             correctCount++;
@@ -452,12 +608,14 @@
         } else {
             currentQuestionScore = Math.max(0, currentQuestionScore - 5);
             flashEffect('error');
+            
             if(selectedPlayType === 'zoom') {
                 currentZoom = Math.max(1.0, currentZoom - zoomStep);
                 applyZoom();
-            } else {
+            } else if (selectedPlayType === 'silhouette') {
                 revealRandomTile();
             }
+
             dom.currentRoundScore.innerText = `本題價值：${currentQuestionScore}`;
             dom.message.className = 'error';
             dom.message.innerText = '❌ 猜錯了！';
@@ -471,9 +629,18 @@
         if(selectedPlayType === 'zoom') {
             currentZoom = 1.0;
             applyZoom();
-        } else {
+        } else if (selectedPlayType === 'silhouette') {
             dom.tileGrid.querySelectorAll('.tile').forEach(t => t.classList.add('revealed'));
+        } else if (selectedPlayType === 'info') {
+            dom.infoModeContainer.style.display = 'none';
+            dom.imageContainerBlock.style.display = 'flex';
+            dom.silhouetteContainer.style.display = 'none';
+            dom.cardImage.style.display = 'block';
+            dom.loadingText.style.display = 'none';
+            dom.cardImage.src = `https://d1h5mn9kk900cf.cloudfront.net/toswebsites/gallery/cards/${parseInt(currentCard.id, 10)}.jpg`;
+            dom.cardImage.style.transform = 'scale(1)';
         }
+
         dom.message.className = isWin ? 'success' : 'error';
         dom.message.innerText = msg;
         dom.actionButtons.style.display = 'none';
