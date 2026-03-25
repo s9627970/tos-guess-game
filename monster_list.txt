@@ -3,7 +3,7 @@ id:10820 name:情定棋局 ‧ 黑嘉嘉 attribute:暗 race:人類 star:6 first_
 id:10821 name:後來居上 ‧ 白棋 attribute:光 race:妖精類 star:6 first_tag:黑與白
 id:10822 name:構築先機 ‧ 黑棋 attribute:暗 race:妖精類 star:6 first_tag:黑與白
 id:10823 name:人造棋師 ‧ 道知 attribute:光 race:機械族 star:6 first_tag:地獄魔王
-id:10824 name:喵之一手 ‧ Bubu attribute:水 race:獸類 star:6 first_tag:喵之一手
+id:10824 name:喵之一手 ‧ Bubu attribute:水 race:獸類 star:6 first_tag:黑嘉嘉
 id:10825 name:詭秘聖祭 ‧ 奧米伽 attribute:水 race:機械族 star:6 first_tag:地獄魔王
 id:10826 name:莊嚴規律 ‧ 藍德南 attribute:木 race:人類 star:6 first_tag:公會任務
 id:10827 name:魔法石靈 ‧ 帕拉伊巴 attribute:水 race:妖精類 star:7 first_tag:地獄魔王
@@ -18,8 +18,8 @@ id:10840 name:極惡凶煞 ‧ 不周山邪祟 (龍) attribute:暗 race:龍類 s
 id:10841 name:鯉躍天翔 ‧ 軒轅 attribute:水 race:龍類 star:7 first_tag:黑金
 id:10842 name:破厄天弓 ‧ 帝鴻 attribute:光 race:獸類 star:7 first_tag:黑金
 id:10843 name:寳塔護陣 ‧ 炎帝 attribute:火 race:神族 star:6 first_tag:寳塔護陣
-id:10844 name:精妙棋訣 ‧ 黑嘉嘉 attribute:水 race:人類 star:6 first_tag:萬里棋境
-id:10845 name:破局鏗鳴 ‧ 黑嘉嘉 attribute:暗 race:妖精類 star:6 first_tag:萬里棋境
+id:10844 name:精妙棋訣 ‧ 黑嘉嘉 attribute:水 race:人類 star:6 first_tag:黑嘉嘉
+id:10845 name:破局鏗鳴 ‧ 黑嘉嘉 attribute:暗 race:妖精類 star:6 first_tag:黑嘉嘉
 id:10846 name:迷津指點 ‧ 小硯 attribute:暗 race:妖精類 star:6 first_tag:福星高照
 id:10847 name:靈驗籤詩 ‧ 小筆 attribute:木 race:妖精類 star:6 first_tag:福星高照
 id:10848 name:大仙顯靈 ‧ 黃大仙 attribute:光 race:神族 star:6 first_tag:道具蒐集
