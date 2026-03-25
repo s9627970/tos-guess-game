@@ -109,11 +109,27 @@
         .layer-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
         
         #tileGrid {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: grid; grid-template-columns: 1fr; grid-template-rows: repeat(6, 1fr);
-            z-index: 10; pointer-events: none;
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
+            display: grid; 
+            /* 修改這裡：改為 3 欄 2 列 */
+            grid-template-columns: repeat(3, 1fr); 
+            grid-template-rows: repeat(2, 1fr);
+            z-index: 10; 
+            pointer-events: none;
         }
-        .tile { background-color: #1a1a2e; border-bottom: 1px solid rgba(255, 255, 255, 0.1); transition: opacity 0.4s ease; opacity: 1; }
+
+        /* 為了美觀，建議把 border 改成四周都有，更有拼圖感 */
+        .tile { 
+            background-color: #1a1a2e; 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            transition: opacity 0.4s ease; 
+            opacity: 1; 
+            box-sizing: border-box; /* 確保邊框不會撐破網格 */
+        }
         .tile.revealed { opacity: 0; }
 
         #loadingText { position: absolute; font-weight: bold; z-index: 15; color: var(--primary-blue); }
@@ -393,9 +409,11 @@
         dom.guessInput.focus();
     }
 
-    function setupVerticalTiles() {
+    function setupVerticalTiles() { // 保留原函數名避免報錯，或同步修改呼叫處
         dom.tileGrid.innerHTML = '';
         hiddenTiles = [];
+        
+        // 總共 3x2 = 6 格
         for (let i = 0; i < 6; i++) {
             const tile = document.createElement('div');
             tile.className = 'tile';
