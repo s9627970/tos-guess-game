@@ -407,16 +407,27 @@
     dom.cardImage.onload = () => { dom.loadingText.style.display = 'none'; dom.cardImage.style.display = 'block'; };
     dom.cardImage.onerror = () => { pickRandomCard(); };
 
+    // 修正後的輸入監聽器：搜尋範圍會隨模式自動調整
     dom.guessInput.addEventListener('input', () => {
         const val = dom.guessInput.value.trim();
         dom.suggestionsDropdown.innerHTML = '';
         if (!val) { dom.suggestionsDropdown.style.display = 'none'; return; }
-        const matches = cardsData.filter(c => c.name.includes(val)).slice(0, 30);
+
+        // --- 重點修正：將 cardsData 改成 gameCardsPool ---
+        // 這樣在「部分題庫」時，建議清單就只會出現 ID > 10819 的卡
+        const matches = gameCardsPool.filter(c => c.name.includes(val)).slice(0, 30);
+        // ----------------------------------------------
+
         matches.forEach(card => {
             const div = document.createElement('div');
             div.className = 'suggestion-item';
             div.innerHTML = `<img class="suggestion-icon" src="https://d1h5mn9kk900cf.cloudfront.net/toswebsites/gallery/icons/${formatIconId(card.id)}.jpg" onerror="this.src='//:0'"><span>${card.name}</span>`;
-            div.onclick = () => { dom.guessInput.value = card.name; dom.suggestionsDropdown.style.display = 'none'; handleGuess(card); };
+            
+            div.onclick = () => { 
+                dom.guessInput.value = card.name; 
+                dom.suggestionsDropdown.style.display = 'none'; 
+                handleGuess(card); 
+            };
             dom.suggestionsDropdown.appendChild(div);
         });
         dom.suggestionsDropdown.style.display = matches.length ? 'block' : 'none';
