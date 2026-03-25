@@ -5,8 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>神魔之塔 - 猜卡片限時挑戰</title>
     <style>
+        :root {
+            --primary-blue: #4db8ff;
+            --success-green: #4caf50;
+            --error-red: #ff5252;
+            --panel-bg: rgba(42, 42, 64, 0.95);
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
             background: #1e1e2f url('background.jpg') no-repeat center center fixed;
             background-size: cover;
             color: #ffffff;
@@ -16,24 +23,29 @@
             min-height: 100vh;
             margin: 0;
             padding: 20px;
+            overflow-x: hidden;
         }
 
+        /* 狀態板 */
         #statusBoard {
             position: fixed;
             top: 20px;
             right: 20px;
-            background: rgba(42, 42, 64, 0.9);
+            background: var(--panel-bg);
             padding: 15px 25px;
-            border-radius: 10px;
-            border: 2px solid #4db8ff;
+            border-radius: 12px;
+            border: 2px solid var(--primary-blue);
             z-index: 1000;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             text-align: right;
+            backdrop-filter: blur(5px);
+            display: none; /* 初始隱藏 */
         }
-        #timerText { font-size: 24px; color: #ff5252; font-weight: bold; display: block; }
-        #scoreText { font-size: 18px; color: #4db8ff; font-weight: bold; }
-        #currentRoundScore { font-size: 12px; color: #aaa; display: block; }
+        #timerText { font-size: 24px; color: var(--error-red); font-weight: bold; display: block; }
+        #scoreText { font-size: 18px; color: var(--primary-blue); font-weight: bold; }
+        #currentRoundScore { font-size: 13px; color: #aaa; display: block; margin-top: 5px; }
 
+        /* 遮罩層通用樣式 */
         .overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -43,43 +55,48 @@
             align-items: center;
             justify-content: center;
             z-index: 2000;
+            backdrop-filter: blur(8px);
         }
         .overlay-content {
             background: #2a2a40;
             padding: 40px;
             border-radius: 20px;
-            border: 3px solid #4db8ff;
+            border: 3px solid var(--primary-blue);
             text-align: center;
             max-width: 500px;
             width: 90%;
         }
-        .overlay h2 { color: #4db8ff; font-size: 32px; margin-bottom: 20px; }
-        .overlay p { font-size: 18px; margin-bottom: 30px; line-height: 1.6; }
+        .overlay h2 { color: var(--primary-blue); font-size: 32px; margin-top: 0; }
         
         .start-btn {
-            background: #4caf50; color: white; padding: 15px 40px;
+            background: var(--success-green); color: white; padding: 15px 40px;
             font-size: 20px; border-radius: 10px; cursor: pointer; border: none;
             transition: transform 0.2s, filter 0.2s;
             margin: 10px;
-            width: 80%;
+            width: 85%;
+            font-weight: bold;
         }
-        .start-btn:hover { transform: scale(1.05); filter: brightness(1.1); }
-        .start-btn:disabled { background: #555 !important; cursor: wait; transform: none; }
+        .start-btn:hover:not(:disabled) { transform: scale(1.05); filter: brightness(1.1); }
+        .start-btn:disabled { background: #555; cursor: not-allowed; opacity: 0.7; }
 
-        .mode-container { display: flex; gap: 20px; justify-content: center; margin-top: 20px; }
+        .mode-container { display: flex; gap: 15px; justify-content: center; margin-top: 20px; }
         .mode-btn {
             flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 20px 10px; height: 120px; font-size: 24px; font-weight: bold;
-            width: auto;
+            padding: 15px 5px; height: 100px; font-size: 22px; width: auto;
         }
-        .mode-btn span { font-size: 14px; font-weight: normal; margin-top: 5px; opacity: 0.9; }
 
+        /* 主容器 */
         .container {
-            background-color: rgba(42, 42, 64, 0.95);
-            padding: 25px; border-radius: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+            background-color: var(--panel-bg);
+            padding: 30px; border-radius: 20px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
             text-align: center; max-width: 550px; width: 100%; margin-top: 60px;
+            opacity: 0.3; pointer-events: none; /* 遊戲開始前不可點擊 */
+            transition: opacity 0.5s;
         }
-        h1 { color: #4db8ff; margin-bottom: 20px; }
+        .container.active { opacity: 1; pointer-events: auto; }
+
+        h1 { color: var(--primary-blue); margin-bottom: 20px; }
 
         .image-container {
             width: 100%; height: 500px; margin-bottom: 20px; border-radius: 10px;
@@ -87,31 +104,30 @@
             justify-content: center; position: relative; border: 2px solid #3a3a50;
         }
         
-        /* 縮放模式的圖片 */
-        #cardImage { width: 100%; height: 100%; object-fit: contain; display: none; transition: transform 0.8s; }
+        #cardImage { width: 100%; height: 100%; object-fit: contain; display: none; }
+        #silhouetteContainer { width: 100%; height: 100%; position: relative; display: none; }
+        .layer-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
         
-        /* 剪影模式的圖片容器與設定 */
-        #silhouetteContainer {
-            width: 100%; height: 100%; position: relative; display: none;
+        #tileGrid {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: grid; grid-template-columns: 1fr; grid-template-rows: repeat(6, 1fr);
+            z-index: 10; pointer-events: none;
         }
-        .layer-img {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain;
-        }
-        #bwImage { z-index: 1; }
-        #colorImage { z-index: 2; transition: clip-path 0.5s ease-in-out; }
+        .tile { background-color: #1a1a2e; border-bottom: 1px solid rgba(255, 255, 255, 0.1); transition: opacity 0.4s ease; opacity: 1; }
+        .tile.revealed { opacity: 0; }
 
-        #loadingText { position: absolute; font-weight: bold; z-index: 10; }
+        #loadingText { position: absolute; font-weight: bold; z-index: 15; color: var(--primary-blue); }
 
         .controls { position: relative; display: flex; flex-direction: column; gap: 12px; }
         #guessInput {
             padding: 14px; font-size: 16px; border-radius: 8px; border: 2px solid #4db8ff;
-            background-color: #1e1e2f; color: white; width: 100%; box-sizing: border-box;
+            background-color: #1e1e2f; color: white; width: 100%; box-sizing: border-box; outline: none;
         }
 
         .suggestions-dropdown {
             position: absolute; top: 55px; left: 0; width: 100%;
-            background-color: #2a2a40; border: 1px solid #4db8ff; border-radius: 8px;
-            max-height: 300px; overflow-y: auto; z-index: 100; display: none;
+            background-color: #2a2a40; border: 1px solid var(--primary-blue); border-radius: 8px;
+            max-height: 250px; overflow-y: auto; z-index: 100; display: none;
         }
         .suggestion-item { display: flex; align-items: center; gap: 12px; padding: 10px; cursor: pointer; border-bottom: 1px solid #3a3a50; }
         .suggestion-item:hover { background-color: #3e3e5a; }
@@ -119,23 +135,28 @@
 
         .btn-group { display: flex; gap: 10px; }
         button { padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; border: none; font-size: 16px; }
-        #submitBtn { background-color: #4db8ff; color: #1e1e2f; flex: 2; }
+        #submitBtn { background-color: var(--primary-blue); color: #1e1e2f; flex: 2; }
         #giveUpBtn { background-color: #f44336; color: white; flex: 1; }
-        #nextBtn { background-color: #4caf50; color: white; display: none; width: 100%; }
+        #nextBtn { background-color: var(--success-green); color: white; display: none; width: 100%; }
 
         #message { margin-top: 15px; font-size: 18px; font-weight: bold; min-height: 24px; }
-        .success { color: #4caf50; }
-        .error { color: #ff5252; }
+        .success { color: var(--success-green); }
+        .error { color: var(--error-red); }
 
         .history-container {
-            background-color: rgba(29, 29, 41, 0.95);
+            background-color: var(--panel-bg);
             padding: 20px; border-radius: 15px; max-width: 550px; width: 100%; margin-top: 20px;
         }
-        #guessHistoryList { list-style: none; padding: 0; display: flex; flex-direction: column-reverse; gap: 10px; max-height: 200px; overflow-y: auto; }
+        #guessHistoryList { list-style: none; padding: 0; display: flex; flex-direction: column-reverse; gap: 10px; max-height: 180px; overflow-y: auto; }
         .history-item { display: flex; align-items: center; gap: 15px; padding: 10px; background: #252538; border-radius: 8px; border-left: 5px solid #aaa; }
-        .history-item.correct { border-left-color: #4caf50; }
-        .history-item.wrong { border-left-color: #f44336; }
+        .history-item.correct { border-left-color: var(--success-green); }
+        .history-item.wrong { border-left-color: var(--error-red); }
         .history-icon { width: 40px; height: 40px; border-radius: 4px; }
+
+        .flash-success { animation: flashG 0.4s; }
+        .flash-error { animation: flashR 0.4s; }
+        @keyframes flashG { 0% { background-color: rgba(76, 175, 80, 0.3); } 100% { background-color: transparent; } }
+        @keyframes flashR { 0% { background-color: rgba(255, 82, 82, 0.3); } 100% { background-color: transparent; } }
     </style>
 </head>
 <body>
@@ -150,7 +171,7 @@
     <div class="overlay-content">
         <h2>選擇遊戲玩法</h2>
         <button class="start-btn" style="background: #e91e63;" onclick="selectGameType('zoom')">🔍 圖片縮放猜卡</button>
-        <button class="start-btn" style="background: #9c27b0;" onclick="selectGameType('silhouette')">👤 圖片剪影猜卡</button>
+        <button class="start-btn" style="background: #9c27b0;" onclick="selectGameType('silhouette')">🎞️ 圖片剪影猜卡</button>
     </div>
 </div>
 
@@ -158,14 +179,8 @@
     <div class="overlay-content">
         <h2>選擇挑戰題庫</h2>
         <div class="mode-container">
-            <button id="modeBtnAll" class="start-btn mode-btn" style="background: #4db8ff; color: #1e1e2f;" onclick="selectMode('all')">
-                全部題庫
-                <span>(所有卡片)</span>
-            </button>
-            <button id="modeBtnRecent" class="start-btn mode-btn" style="background: #ff9800; color: white;" onclick="selectMode('recent')">
-                部分題庫
-                <span>(編號 > 10819)</span>
-            </button>
+            <button class="start-btn mode-btn" style="background: var(--primary-blue); color: #1e1e2f;" onclick="selectMode('all')">全部題庫</button>
+            <button class="start-btn mode-btn" style="background: #ff9800;" onclick="selectMode('recent')">新卡題庫</button>
         </div>
         <p id="loadStatusText" style="margin-top:20px; color:#aaa; font-size:14px;"></p>
     </div>
@@ -174,29 +189,27 @@
 <div id="startOverlay" class="overlay" style="display: none;">
     <div class="overlay-content">
         <h2>限時挑戰規則</h2>
-        <p id="ruleDescription">你有 5 分鐘的時間可以挑戰！<br>每題基本 50 分，猜錯扣 5 分。<br>看你能拿到多少分？</p>
-        <button class="start-btn" onclick="initGame()">開始計時</button>
+        <p id="ruleDescription"></p>
+        <button id="realStartBtn" class="start-btn" onclick="initGame()" disabled>正在準備中...</button>
     </div>
 </div>
 
 <div id="resultOverlay" class="overlay" style="display: none;">
     <div class="overlay-content">
         <h2>時間到！</h2>
-        <p id="finalResultText">總分：0<br>答對題數：0</p>
-        <button class="start-btn" style="background:#4db8ff" onclick="location.reload()">再玩一次</button>
+        <p id="finalResultText" style="font-size:22px;"></p>
+        <button class="start-btn" style="background:var(--primary-blue)" onclick="location.reload()">再玩一次</button>
     </div>
 </div>
 
-<div class="container">
+<div class="container" id="gameMainContainer">
     <h1 id="mainTitle">神魔之塔 猜卡片</h1>
     <div class="image-container">
-        <span id="loadingText">請選擇模式開始</span>
-        
+        <span id="loadingText">請選擇模式</span>
         <img id="cardImage" src="" alt="卡片圖片">
-        
         <div id="silhouetteContainer">
-            <img id="bwImage" class="layer-img" src="" alt="黑白底圖">
             <img id="colorImage" class="layer-img" src="" alt="彩色原圖">
+            <div id="tileGrid"></div>
         </div>
     </div>
     
@@ -204,16 +217,16 @@
         <input type="text" id="guessInput" placeholder="輸入卡片名稱..." autocomplete="off" disabled>
         <div id="suggestionsDropdown" class="suggestions-dropdown"></div>
         <div class="btn-group" id="actionButtons">
-            <button id="submitBtn" disabled>猜測</button>
+            <button id="submitBtn" disabled>猜測 (Enter)</button>
             <button id="giveUpBtn" disabled>看答案</button>
         </div>
-        <button id="nextBtn">下一張卡片</button>
+        <button id="nextBtn">下一張卡片 (Enter)</button>
     </div>
     <div id="message"></div>
 </div>
 
 <div class="history-container">
-    <h3 style="margin: 0 0 15px 0; color: #4db8ff; font-size: 14px;">猜測紀錄</h3>
+    <h3 style="margin: 0 0 10px 0; color: var(--primary-blue); font-size: 14px;">猜測紀錄</h3>
     <ul id="guessHistoryList"></ul>
 </div>
 
@@ -221,28 +234,24 @@
     let cardsData = [];
     let gameCardsPool = []; 
     let currentCard = null;
-    
-    // 遊戲狀態與設定
-    let selectedPlayType = 'zoom'; // 'zoom' 或 'silhouette'
-    let gameMode = 'all';
+    let hiddenTiles = [];
+    let selectedPlayType = 'zoom'; 
     let totalScore = 0;
     let correctCount = 0;
     let currentQuestionScore = 50;
     let timeLeft = 300;
     let gameTimer = null;
-    let wrongGuessCount = 0; // 用於記錄這題猜錯幾次
+    let isDataLoaded = false;
 
-    // 縮放模式參數
-    let initialZoom = 8.0, currentZoom = initialZoom, zoomStep = 1.2;
+    const initialZoom = 8.0, zoomStep = 1.3;
+    let currentZoom = initialZoom;
     let focusX = 50, focusY = 50;
-    // 剪影模式參數
-    const maxSlices = 6; // 分成 6 等份
 
     const dom = {
         cardImage: document.getElementById('cardImage'),
         silhouetteContainer: document.getElementById('silhouetteContainer'),
-        bwImage: document.getElementById('bwImage'),
         colorImage: document.getElementById('colorImage'),
+        tileGrid: document.getElementById('tileGrid'),
         loadingText: document.getElementById('loadingText'),
         guessInput: document.getElementById('guessInput'),
         suggestionsDropdown: document.getElementById('suggestionsDropdown'),
@@ -262,12 +271,14 @@
         resultOverlay: document.getElementById('resultOverlay'),
         finalResultText: document.getElementById('finalResultText'),
         mainTitle: document.getElementById('mainTitle'),
-        ruleDescription: document.getElementById('ruleDescription')
+        ruleDescription: document.getElementById('ruleDescription'),
+        gameMainContainer: document.getElementById('gameMainContainer'),
+        statusBoard: document.getElementById('statusBoard'),
+        realStartBtn: document.getElementById('realStartBtn')
     };
 
     function formatIconId(id) { return id.toString().padStart(4, '0'); }
 
-    // 步驟 1: 選擇玩法
     function selectGameType(type) {
         selectedPlayType = type;
         dom.gameTypeOverlay.style.display = 'none';
@@ -275,196 +286,167 @@
         
         if(type === 'zoom') {
             dom.mainTitle.innerText = "神魔之塔 - 圖片縮放猜卡";
-            dom.ruleDescription.innerHTML = "你有 5 分鐘的時間可以挑戰！<br>每題基本 50 分，猜錯扣 5 分並縮小圖片。<br>看你能拿到多少分？";
+            dom.ruleDescription.innerHTML = "5 分鐘挑戰！<br>每題 50 分，猜錯扣 5 分並縮小圖片。";
         } else {
-            dom.mainTitle.innerText = "神魔之塔 - 圖片剪影猜卡";
-            dom.ruleDescription.innerHTML = "你有 5 分鐘的時間可以挑戰！<br>每題基本 50 分，猜錯扣 5 分並顯示更多原圖。<br>看你能拿到多少分？";
+            dom.mainTitle.innerText = "神魔之塔 - 垂直六格猜卡";
+            dom.ruleDescription.innerHTML = "5 分鐘挑戰！<br>圖片分六格，初始隨機開一格。<br>猜錯扣 5 分並隨機增開一格。";
         }
     }
 
-    // 步驟 2: 點擊按鈕後載入題庫
     async function selectMode(mode) {
-        const startTime = performance.now();
-        gameMode = mode;
+        // 防止重複點擊
+        if (isDataLoaded) return;
         
-        document.getElementById('modeBtnAll').disabled = true;
-        document.getElementById('modeBtnRecent').disabled = true;
-        dom.loadStatusText.innerText = "正在讀取資料並進行完整性檢查...";
+        dom.loadStatusText.innerText = "正在讀取卡片資料，請稍候...";
+        const btns = dom.modeSelectionOverlay.querySelectorAll('button');
+        btns.forEach(b => b.disabled = true);
 
         try {
             const response = await fetch('card_name.txt?t=' + new Date().getTime());
-            if (!response.ok) throw new Error(`HTTP 錯誤! 狀態碼: ${response.status}`);
-            
+            if (!response.ok) throw new Error("檔案讀取失敗");
             const text = await response.text();
             const lines = text.split('\n');
-            
             cardsData = [];
-            let errorLines = 0;
-
             lines.forEach((line) => {
-                const cleanLine = line.trim();
-                if (!cleanLine) return; 
-
-                const match = cleanLine.match(/^(\d+)\s+(.+)$/);
-                if (match) {
-                    cardsData.push({ id: match[1], name: match[2].trim() });
-                } else {
-                    errorLines++;
-                }
+                const match = line.trim().match(/^(\d+)\s+(.+)$/);
+                if (match) cardsData.push({ id: match[1], name: match[2].trim() });
             });
-
-            if (cardsData.length === 0) {
-                dom.loadStatusText.innerHTML = `<span style="color:#ff5252">❌ 無法從檔案中解析任何資料。</span>`;
-                return;
-            }
-
-            if (gameMode === 'recent') {
-                gameCardsPool = cardsData.filter(c => parseInt(c.id, 10) > 10819);
-            } else {
-                gameCardsPool = cardsData;
-            }
-
-            if (gameCardsPool.length === 0) {
-                alert(`錯誤：目前的題庫中沒有符合該模式的卡片！`);
-                location.reload();
-                return;
-            }
-
+            gameCardsPool = (mode === 'recent') ? cardsData.filter(c => parseInt(c.id, 10) > 10819) : cardsData;
+            
+            isDataLoaded = true;
             dom.modeSelectionOverlay.style.display = 'none';
             dom.startOverlay.style.display = 'flex';
-
+            dom.realStartBtn.disabled = false;
+            dom.realStartBtn.innerText = "開始挑戰";
         } catch (e) {
-            console.error(e);
-            dom.loadStatusText.innerHTML = `<span style="color:#ff5252">❌ 載入失敗: ${e.message}</span>`;
+            dom.loadStatusText.innerHTML = `<span style="color:red">載入失敗: ${e.message}</span>`;
+            btns.forEach(b => b.disabled = false);
         }
     }
 
-    // 步驟 3: 初始化遊戲
     function initGame() {
         dom.startOverlay.style.display = 'none';
+        dom.statusBoard.style.display = 'block';
+        dom.gameMainContainer.classList.add('active');
         dom.guessInput.disabled = false;
         dom.submitBtn.disabled = false;
         dom.giveUpBtn.disabled = false;
-        
-        // 根據選擇的玩法顯示對應的容器
-        if(selectedPlayType === 'zoom') {
-            dom.cardImage.style.display = 'block';
-            dom.silhouetteContainer.style.display = 'none';
-        } else {
-            dom.cardImage.style.display = 'none';
-            dom.silhouetteContainer.style.display = 'block';
-        }
         
         startTimer();
         pickRandomCard();
     }
 
-    // 計時器
     function startTimer() {
+        if (gameTimer) clearInterval(gameTimer);
         gameTimer = setInterval(() => {
             timeLeft--;
             let mins = Math.floor(timeLeft / 60);
             let secs = timeLeft % 60;
             dom.timerText.innerText = `剩餘時間：${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-            if (timeLeft <= 0) {
-                clearInterval(gameTimer);
-                endChallenge();
-            }
+            if (timeLeft <= 0) { clearInterval(gameTimer); endChallenge(); }
         }, 1000);
     }
 
-    // 結束畫面
     function endChallenge() {
         dom.guessInput.disabled = true;
         dom.submitBtn.disabled = true;
-        dom.giveUpBtn.disabled = true;
         dom.resultOverlay.style.display = 'flex';
-        dom.finalResultText.innerHTML = `總分：${totalScore}<br>答對題數：${correctCount} 題`;
+        dom.finalResultText.innerHTML = `總分：${totalScore}<br>答對題數：${correctCount}`;
     }
 
-    // 抽卡
     function pickRandomCard() {
+        if (!gameCardsPool.length) return;
+        
         const randomIndex = Math.floor(Math.random() * gameCardsPool.length);
         currentCard = gameCardsPool[randomIndex];
-
         currentQuestionScore = 50;
-        wrongGuessCount = 0;
+        
+        // 清理 UI
         updateUI();
+        dom.cardImage.style.display = 'none';
+        dom.silhouetteContainer.style.display = 'none';
+        dom.loadingText.style.display = 'block';
+        dom.loadingText.innerText = "載入卡片中...";
+
+        const imgUrl = `https://d1h5mn9kk900cf.cloudfront.net/toswebsites/gallery/cards/${parseInt(currentCard.id, 10)}.jpg`;
 
         if(selectedPlayType === 'zoom') {
-            dom.cardImage.style.display = 'none'; 
-            dom.cardImage.src = `https://d1h5mn9kk900cf.cloudfront.net/toswebsites/gallery/cards/${parseInt(currentCard.id, 10)}.jpg`;
-            focusX = Math.floor(Math.random() * 20) + 40; 
-            focusY = Math.floor(Math.random() * 20) + 40; 
-            currentZoom = initialZoom;
-            applyZoom();
-        } else {
-            // 剪影模式
-            dom.silhouetteContainer.style.display = 'none'; 
-            dom.loadingText.style.display = 'block';
-            
-            // 設定來源：原圖與黑白圖
-            dom.bwImage.src = `done_image/${parseInt(currentCard.id, 10)}.png`;
-            dom.colorImage.src = `source_image/${parseInt(currentCard.id, 10)}.jpg`;
-            
-            // 等待圖片載入完成才顯示
-            let loadedCount = 0;
-            const checkLoad = () => {
-                loadedCount++;
-                if(loadedCount === 2) {
-                    dom.loadingText.style.display = 'none';
-                    dom.silhouetteContainer.style.display = 'block';
-                    updateSilhouetteMask();
-                }
+            dom.cardImage.src = imgUrl;
+            dom.cardImage.onload = () => {
+                dom.loadingText.style.display = 'none';
+                dom.cardImage.style.display = 'block';
+                focusX = Math.floor(Math.random() * 40) + 30; 
+                focusY = Math.floor(Math.random() * 40) + 30; 
+                currentZoom = initialZoom;
+                applyZoom();
             };
-            
-            dom.bwImage.onload = checkLoad;
-            dom.colorImage.onload = checkLoad;
-            
-            // 處理圖片載入失敗
-            dom.bwImage.onerror = () => pickRandomCard();
-            dom.colorImage.onerror = () => pickRandomCard();
+            dom.cardImage.onerror = pickRandomCard;
+        } else {
+            dom.colorImage.src = imgUrl;
+            dom.colorImage.onload = () => {
+                dom.loadingText.style.display = 'none';
+                dom.silhouetteContainer.style.display = 'block';
+                setupVerticalTiles();
+            };
+            dom.colorImage.onerror = pickRandomCard;
+        }
+        dom.guessInput.focus();
+    }
+
+    function setupVerticalTiles() {
+        dom.tileGrid.innerHTML = '';
+        hiddenTiles = [];
+        for (let i = 0; i < 6; i++) {
+            const tile = document.createElement('div');
+            tile.className = 'tile';
+            dom.tileGrid.appendChild(tile);
+            hiddenTiles.push(tile);
+        }
+        revealRandomTile();
+    }
+
+    function revealRandomTile() {
+        if (hiddenTiles.length > 0) {
+            const idx = Math.floor(Math.random() * hiddenTiles.length);
+            hiddenTiles[idx].classList.add('revealed');
+            hiddenTiles.splice(idx, 1);
         }
     }
 
-    // 重設 UI
     function updateUI() {
         dom.scoreText.innerText = `總分：${totalScore}`;
         dom.currentRoundScore.innerText = `本題價值：${currentQuestionScore}`;
-        dom.loadingText.style.display = 'block';
-        dom.loadingText.innerText = "卡片載入中...";
         dom.message.innerText = '';
         dom.guessInput.value = '';
         dom.historyList.innerHTML = '';
         dom.nextBtn.style.display = 'none';
         dom.actionButtons.style.display = 'flex';
+        dom.suggestionsDropdown.style.display = 'none';
     }
 
-    // 處理猜測結果
     function handleGuess(guessedCard) {
-        const isCorrect = guessedCard.name === currentCard.name;
-        if (isCorrect) {
+        if (guessedCard.name === currentCard.name) {
             totalScore += currentQuestionScore;
             correctCount++;
+            flashEffect('success');
             endRound(true, `🎉 答對了！+${currentQuestionScore} 分`);
+            addHistoryRecord(guessedCard, true);
         } else {
-            wrongGuessCount++;
             currentQuestionScore = Math.max(0, currentQuestionScore - 5);
-            
+            flashEffect('error');
             if(selectedPlayType === 'zoom') {
                 currentZoom = Math.max(1.0, currentZoom - zoomStep);
                 applyZoom();
             } else {
-                updateSilhouetteMask();
+                revealRandomTile();
             }
-            
-            dom.scoreText.innerText = `總分：${totalScore}`;
             dom.currentRoundScore.innerText = `本題價值：${currentQuestionScore}`;
             dom.message.className = 'error';
-            dom.message.innerText = '❌ 猜錯了，分數扣減！';
+            dom.message.innerText = '❌ 猜錯了！';
+            addHistoryRecord(guessedCard, false);
             dom.guessInput.value = '';
+            dom.guessInput.focus();
         }
-        addHistoryRecord(guessedCard, isCorrect);
     }
 
     function endRound(isWin, msg) {
@@ -472,66 +454,51 @@
             currentZoom = 1.0;
             applyZoom();
         } else {
-            // 顯示整張圖
-            wrongGuessCount = maxSlices; 
-            updateSilhouetteMask();
+            dom.tileGrid.querySelectorAll('.tile').forEach(t => t.classList.add('revealed'));
         }
-        
         dom.message.className = isWin ? 'success' : 'error';
         dom.message.innerText = msg;
         dom.actionButtons.style.display = 'none';
         dom.nextBtn.style.display = 'block';
+        dom.nextBtn.focus();
     }
 
-    // 更新縮放
     function applyZoom() {
         dom.cardImage.style.transformOrigin = `${focusX}% ${focusY}%`;
         dom.cardImage.style.transform = `scale(${currentZoom})`;
     }
 
-    // 更新剪影遮罩 (由上往下顯示)
-    function updateSilhouetteMask() {
-        // 預設錯 0 次顯示 1 份，錯 1 次顯示 2 份... 
-        let partsToShow = wrongGuessCount + 1; 
-        if(partsToShow > maxSlices) partsToShow = maxSlices;
-        
-        // 計算百分比，由上往下顯示，所以 inset 參數為: top right bottom left
-        // bottom 要遮住的百分比 = 100% - (顯示的份數 / 總份數 * 100%)
-        const visiblePercentage = (partsToShow / maxSlices) * 100;
-        const bottomInset = 100 - visiblePercentage;
-        
-        dom.colorImage.style.clipPath = `inset(0 0 ${bottomInset}% 0)`;
+    function flashEffect(type) {
+        dom.gameMainContainer.classList.remove('flash-success', 'flash-error');
+        void dom.gameMainContainer.offsetWidth;
+        dom.gameMainContainer.classList.add(type === 'success' ? 'flash-success' : 'flash-error');
     }
 
-    dom.cardImage.onload = () => { 
-        if(selectedPlayType === 'zoom') {
-            dom.loadingText.style.display = 'none'; 
-            dom.cardImage.style.display = 'block'; 
-        }
-    };
-    dom.cardImage.onerror = () => { pickRandomCard(); };
-
-    // 輸入自動完成
     dom.guessInput.addEventListener('input', () => {
         const val = dom.guessInput.value.trim();
         dom.suggestionsDropdown.innerHTML = '';
         if (!val) { dom.suggestionsDropdown.style.display = 'none'; return; }
-
-        const matches = gameCardsPool.filter(c => c.name.includes(val)).slice(0, 30);
-
+        const matches = gameCardsPool.filter(c => c.name.includes(val)).slice(0, 15);
         matches.forEach(card => {
             const div = document.createElement('div');
             div.className = 'suggestion-item';
-            div.innerHTML = `<img class="suggestion-icon" src="https://d1h5mn9kk900cf.cloudfront.net/toswebsites/gallery/icons/${formatIconId(card.id)}.jpg" onerror="this.src='//:0'"><span>${card.name}</span>`;
-            
-            div.onclick = () => { 
-                dom.guessInput.value = card.name; 
-                dom.suggestionsDropdown.style.display = 'none'; 
-                handleGuess(card); 
-            };
+            div.innerHTML = `<img class="suggestion-icon" src="https://d1h5mn9kk900cf.cloudfront.net/toswebsites/gallery/icons/${formatIconId(card.id)}.jpg"><span>${card.name}</span>`;
+            div.onclick = () => { dom.guessInput.value = card.name; dom.suggestionsDropdown.style.display = 'none'; handleGuess(card); };
             dom.suggestionsDropdown.appendChild(div);
         });
         dom.suggestionsDropdown.style.display = matches.length ? 'block' : 'none';
+    });
+
+    dom.guessInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const val = dom.guessInput.value.trim();
+            const found = cardsData.find(c => c.name === val);
+            if (found) { dom.suggestionsDropdown.style.display = 'none'; handleGuess(found); }
+        }
+    });
+
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && dom.nextBtn.style.display === 'block') pickRandomCard();
     });
 
     dom.submitBtn.onclick = () => {
@@ -550,7 +517,7 @@
     function addHistoryRecord(card, isCorrect) {
         const li = document.createElement('li');
         li.className = `history-item ${isCorrect ? 'correct' : 'wrong'}`;
-        li.innerHTML = `<img class="history-icon" src="https://d1h5mn9kk900cf.cloudfront.net/toswebsites/gallery/icons/${formatIconId(card.id)}.jpg" onerror="this.src='//:0'"><div style="flex-grow:1"><div style="font-size:14px; font-weight:bold;">${card.name}</div><div style="font-size:11px; opacity:0.8;">編號: ${card.id}</div></div><span>${isCorrect ? '✔' : '✘'}</span>`;
+        li.innerHTML = `<img class="history-icon" src="https://d1h5mn9kk900cf.cloudfront.net/toswebsites/gallery/icons/${formatIconId(card.id)}.jpg"><div style="flex-grow:1"><div style="font-size:14px; font-weight:bold;">${card.name}</div><div style="font-size:11px; opacity:0.6;">No. ${card.id}</div></div><span>${isCorrect ? '✔' : '✘'}</span>`;
         dom.historyList.appendChild(li);
         dom.historyList.scrollTop = dom.historyList.scrollHeight;
     }
