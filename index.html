@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>神魔之塔 - 猜卡片限時挑戰</title>
     <style>
+        /* 樣式保持不變，僅增加一個 loading 狀態的按鈕樣式 */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #1e1e2f url('background.jpg') no-repeat center center fixed;
@@ -18,7 +19,6 @@
             padding: 20px;
         }
 
-        /* 右上角分數板與計時器 */
         #statusBoard {
             position: fixed;
             top: 20px;
@@ -35,7 +35,6 @@
         #scoreText { font-size: 18px; color: #4db8ff; font-weight: bold; }
         #currentRoundScore { font-size: 12px; color: #aaa; display: block; }
 
-        /* 開始與結束的彈出層 */
         .overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -52,35 +51,38 @@
             border-radius: 20px;
             border: 3px solid #4db8ff;
             text-align: center;
-            max-width: 400px;
+            max-width: 500px;
+            width: 90%;
         }
         .overlay h2 { color: #4db8ff; font-size: 32px; margin-bottom: 20px; }
         .overlay p { font-size: 18px; margin-bottom: 30px; line-height: 1.6; }
+        
         .start-btn {
             background: #4caf50; color: white; padding: 15px 40px;
             font-size: 20px; border-radius: 10px; cursor: pointer; border: none;
+            transition: transform 0.2s, filter 0.2s;
         }
+        .start-btn:hover { transform: scale(1.05); filter: brightness(1.1); }
+        .start-btn:disabled { background: #555 !important; cursor: wait; transform: none; }
+
+        .mode-container { display: flex; gap: 20px; justify-content: center; margin-top: 20px; }
+        .mode-btn {
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 20px 10px; height: 120px; font-size: 24px; font-weight: bold;
+        }
+        .mode-btn span { font-size: 14px; font-weight: normal; margin-top: 5px; opacity: 0.9; }
 
         .container {
             background-color: rgba(42, 42, 64, 0.95);
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
-            text-align: center;
-            max-width: 550px;
-            width: 100%;
-            margin-top: 60px;
+            padding: 25px; border-radius: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+            text-align: center; max-width: 550px; width: 100%; margin-top: 60px;
         }
         h1 { color: #4db8ff; margin-bottom: 20px; }
 
         .image-container {
-            width: 100%; height: 500px; 
-            margin-bottom: 20px;
-            border-radius: 10px;
-            overflow: hidden;
-            background-color: #000;
-            display: flex; align-items: center; justify-content: center;
-            position: relative; border: 2px solid #3a3a50;
+            width: 100%; height: 500px; margin-bottom: 20px; border-radius: 10px;
+            overflow: hidden; background-color: #000; display: flex; align-items: center;
+            justify-content: center; position: relative; border: 2px solid #3a3a50;
         }
         #cardImage { width: 100%; height: 100%; object-fit: contain; display: none; transition: transform 0.8s; }
         #loadingText { position: absolute; font-weight: bold; }
@@ -129,11 +131,28 @@
     <span id="currentRoundScore">本題價值：50</span>
 </div>
 
-<div id="startOverlay" class="overlay">
+<div id="modeSelectionOverlay" class="overlay">
     <div class="overlay-content">
-        <h2>限時挑戰模式</h2>
+        <h2>選擇挑戰題庫</h2>
+        <div class="mode-container">
+            <button id="modeBtnAll" class="start-btn mode-btn" style="background: #4db8ff; color: #1e1e2f;" onclick="selectMode('all')">
+                全部題庫
+                <span>(所有卡片)</span>
+            </button>
+            <button id="modeBtnRecent" class="start-btn mode-btn" style="background: #ff9800; color: white;" onclick="selectMode('recent')">
+                部分題庫
+                <span>(編號 > 10819)</span>
+            </button>
+        </div>
+        <p id="loadStatusText" style="margin-top:20px; color:#aaa; font-size:14px;"></p>
+    </div>
+</div>
+
+<div id="startOverlay" class="overlay" style="display: none;">
+    <div class="overlay-content">
+        <h2>限時挑戰規則</h2>
         <p>你有 5 分鐘的時間可以挑戰！<br>每題基本 50 分，猜錯扣 5 分。<br>看你能拿到多少分？</p>
-        <button class="start-btn" onclick="initGame()">開始挑戰</button>
+        <button class="start-btn" onclick="initGame()">開始計時</button>
     </div>
 </div>
 
@@ -148,7 +167,7 @@
 <div class="container">
     <h1>神魔之塔 猜卡片</h1>
     <div class="image-container">
-        <span id="loadingText">載入中...</span>
+        <span id="loadingText">請選擇模式開始</span>
         <img id="cardImage" src="" alt="卡片圖片">
     </div>
     <div class="controls">
@@ -170,15 +189,16 @@
 
 <script>
     let cardsData = [];
+    let gameCardsPool = []; // 真正用來抽的題目池
     let currentCard = null;
     let initialZoom = 8.0, currentZoom = initialZoom, zoomStep = 1.2;
     let focusX = 50, focusY = 50;
 
-    // 遊戲狀態
+    let gameMode = 'all';
     let totalScore = 0;
     let correctCount = 0;
     let currentQuestionScore = 50;
-    let timeLeft = 300; // 5分鐘 = 300秒
+    let timeLeft = 300;
     let gameTimer = null;
 
     const dom = {
@@ -195,6 +215,8 @@
         scoreText: document.getElementById('scoreText'),
         timerText: document.getElementById('timerText'),
         currentRoundScore: document.getElementById('currentRoundScore'),
+        modeSelectionOverlay: document.getElementById('modeSelectionOverlay'),
+        loadStatusText: document.getElementById('loadStatusText'),
         startOverlay: document.getElementById('startOverlay'),
         resultOverlay: document.getElementById('resultOverlay'),
         finalResultText: document.getElementById('finalResultText')
@@ -202,21 +224,92 @@
 
     function formatIconId(id) { return id.toString().padStart(4, '0'); }
 
-    // 1. 載入資料
-    async function loadTxtFile() {
+    // 1. 點擊按鈕後才觸發的載入邏輯
+    async function selectMode(mode) {
+        const startTime = performance.now(); // 效能監控：開始時間
+        gameMode = mode;
+        
+        document.getElementById('modeBtnAll').disabled = true;
+        document.getElementById('modeBtnRecent').disabled = true;
+        dom.loadStatusText.innerText = "正在讀取資料並進行完整性檢查...";
+
         try {
             const response = await fetch('card_name.txt?t=' + new Date().getTime());
+            if (!response.ok) throw new Error(`HTTP 錯誤! 狀態碼: ${response.status}`);
+            
             const text = await response.text();
-            text.split('\n').forEach(line => {
-                const match = line.trim().match(/^(\d+)\s+(.+)$/);
-                if (match) cardsData.push({ id: match[1], name: match[2].trim() });
+            const lines = text.split('\n');
+            
+            cardsData = [];
+            let errorLines = 0;
+            let firstError = null;
+
+            lines.forEach((line, index) => {
+                const cleanLine = line.trim();
+                if (!cleanLine) return; // 跳過空行
+
+                const match = cleanLine.match(/^(\d+)\s+(.+)$/);
+                if (match) {
+                    cardsData.push({ id: match[1], name: match[2].trim() });
+                } else {
+                    errorLines++;
+                    if (!firstError) firstError = `第 ${index + 1} 行內容格式異常: "${cleanLine}"`;
+                }
             });
-        } catch (e) { dom.loadingText.innerText = "資料讀取失敗"; }
+
+            // --- 除錯資訊打印 ---
+            const endTime = performance.now();
+            console.group("%c📊 資料載入報告", "color: #4db8ff; font-size: 14px; font-weight: bold;");
+            console.log(`總行數: ${lines.length}`);
+            console.log(`成功解析: ${cardsData.length} 筆`);
+            console.log(`解析失敗: ${errorLines} 筆`);
+            console.log(`載入耗時: ${(endTime - startTime).toFixed(2)} ms`);
+            if (errorLines > 0) console.warn(`解析警告: ${firstError}`);
+            console.groupEnd();
+            // ------------------
+
+            if (cardsData.length === 0) {
+                dom.loadStatusText.innerHTML = `<span style="color:#ff5252">❌ 無法從檔案中解析任何資料，請檢查主控台 (F12)。</span>`;
+                return;
+            }
+
+            // 過濾邏輯與診斷
+            if (gameMode === 'recent') {
+                gameCardsPool = cardsData.filter(c => parseInt(c.id, 10) > 10819);
+                console.log(`🔍 部分題庫模式：篩選出 ${gameCardsPool.length} 張卡片 (ID > 10819)`);
+            } else {
+                gameCardsPool = cardsData;
+                console.log(`🔍 全部題庫模式：共 ${gameCardsPool.length} 張卡片`);
+            }
+
+            if (gameCardsPool.length === 0) {
+                alert(`錯誤：目前的題庫中沒有符合該模式的卡片！`);
+                location.reload();
+                return;
+            }
+
+            dom.modeSelectionOverlay.style.display = 'none';
+            dom.startOverlay.style.display = 'flex';
+
+        } catch (e) {
+            console.error("Critical Error:", e);
+            dom.loadStatusText.innerHTML = `<span style="color:#ff5252">❌ 載入失敗: ${e.message}</span>`;
+            document.getElementById('modeBtnAll').disabled = false;
+            document.getElementById('modeBtnRecent').disabled = false;
+        }
     }
+
+    // 完善後的圖片錯誤監控
+    dom.cardImage.onerror = () => {
+        if (currentCard) {
+            console.error(`🖼️ 圖片載入失敗報告：\n編號: ${currentCard.id}\n名稱: ${currentCard.name}\n連結: ${dom.cardImage.src}`);
+            // 自動跳過這張壞圖，抽下一張
+            pickRandomCard();
+        }
+    };
 
     // 2. 初始化遊戲
     function initGame() {
-        if (cardsData.length === 0) { alert("資料尚未載入完成，請稍候。"); return; }
         dom.startOverlay.style.display = 'none';
         dom.guessInput.disabled = false;
         dom.submitBtn.disabled = false;
@@ -226,14 +319,13 @@
         pickRandomCard();
     }
 
-    // 3. 計時器邏輯
+    // 3. 計時器
     function startTimer() {
         gameTimer = setInterval(() => {
             timeLeft--;
             let mins = Math.floor(timeLeft / 60);
             let secs = timeLeft % 60;
             dom.timerText.innerText = `剩餘時間：${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-            
             if (timeLeft <= 0) {
                 clearInterval(gameTimer);
                 endChallenge();
@@ -241,21 +333,20 @@
         }, 1000);
     }
 
-    // 4. 結束挑戰
+    // 4. 結束
     function endChallenge() {
         dom.guessInput.disabled = true;
         dom.submitBtn.disabled = true;
         dom.giveUpBtn.disabled = true;
         dom.resultOverlay.style.display = 'flex';
-        dom.finalResultText.innerHTML = `總分：${totalScore}<br>總共答對：${correctCount} 題`;
+        dom.finalResultText.innerHTML = `總分：${totalScore}<br>答對題數：${correctCount} 題`;
     }
 
+    // 5. 抽卡 (從已經過濾好的 gameCardsPool 抽)
     function pickRandomCard() {
-        const randomId = Math.floor(Math.random() * 12000) + 1;
-        const foundCard = cardsData.find(c => parseInt(c.id, 10) === randomId);
-        if (!foundCard) { pickRandomCard(); return; }
+        const randomIndex = Math.floor(Math.random() * gameCardsPool.length);
+        currentCard = gameCardsPool[randomIndex];
 
-        currentCard = foundCard;
         currentQuestionScore = 50;
         updateUI();
 
@@ -266,11 +357,13 @@
         applyZoom();
     }
 
+    // 其他 UI 與互動邏輯保持不變...
     function updateUI() {
         dom.scoreText.innerText = `總分：${totalScore}`;
         dom.currentRoundScore.innerText = `本題價值：${currentQuestionScore}`;
         dom.cardImage.style.display = 'none';
         dom.loadingText.style.display = 'block';
+        dom.loadingText.innerText = "卡片載入中...";
         dom.message.innerText = '';
         dom.guessInput.value = '';
         dom.historyList.innerHTML = '';
@@ -318,7 +411,7 @@
         const val = dom.guessInput.value.trim();
         dom.suggestionsDropdown.innerHTML = '';
         if (!val) { dom.suggestionsDropdown.style.display = 'none'; return; }
-        const matches = cardsData.filter(c => c.name.includes(val));
+        const matches = cardsData.filter(c => c.name.includes(val)).slice(0, 30);
         matches.forEach(card => {
             const div = document.createElement('div');
             div.className = 'suggestion-item';
@@ -350,7 +443,8 @@
         dom.historyList.scrollTop = dom.historyList.scrollHeight;
     }
 
-    window.onload = loadTxtFile;
+    // 取消 onload 載入
+    // window.onload = loadTxtFile; 
 </script>
 
 </body>
