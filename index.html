@@ -44,6 +44,7 @@
         #timerText { font-size: 24px; color: var(--error-red); font-weight: bold; display: block; }
         #scoreText { font-size: 18px; color: var(--primary-blue); font-weight: bold; }
         #currentRoundScore { font-size: 13px; color: #aaa; display: block; margin-top: 5px; }
+        #currentRoundScore, #skipCountText { font-size: 13px; color: #aaa; display: block; margin-top: 5px; }
 
         /* 遮罩層通用樣式 */
         .overlay {
@@ -230,6 +231,7 @@
     <span id="timerText">剩餘時間：05:00</span>
     <span id="scoreText">總分：0</span>
     <span id="currentRoundScore">本題價值：50</span>
+    <span id="skipCountText">跳過總次數：0</span> </div>
 </div>
 
 <div id="gameTypeOverlay" class="overlay">
@@ -336,6 +338,7 @@
     let timeLeft = 300;
     let gameTimer = null;
     let isDataLoaded = false;
+    let skipCount = 0;
 
     const initialZoom = 8.0, zoomStep = 1.3;
     let currentZoom = initialZoom;
@@ -361,6 +364,7 @@
         scoreText: document.getElementById('scoreText'),
         timerText: document.getElementById('timerText'),
         currentRoundScore: document.getElementById('currentRoundScore'),
+        skipCountText: document.getElementById('skipCountText'),
         gameTypeOverlay: document.getElementById('gameTypeOverlay'),
         modeSelectionOverlay: document.getElementById('modeSelectionOverlay'),
         timeSelectionOverlay: document.getElementById('timeSelectionOverlay'), // 新增
@@ -734,6 +738,8 @@
 
     dom.giveUpBtn.onclick = () => {
         currentQuestionScore = 0;
+        skipCount++; 
+        dom.skipCountText.innerText = `跳過總次數：${skipCount}`;
         endRound(false, `💡 答案是：「${currentCard.name}」`);
     };
 
