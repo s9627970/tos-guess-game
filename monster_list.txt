@@ -312,4 +312,15 @@ id:11152 name:身手矯健長髮女 attribute:火 race:妖精類 star:6 first_ta
 id:11153 name:神西 attribute:水 race:獸類 star:6 first_tag:膽大黨
 id:11154 name:蒙古死亡蠕蟲 attribute:光 race:龍類 star:6 first_tag:膽大黨
 id:11155 name:邪視之力 ‧ 寺仁 attribute:暗 race:魔族 star:7 first_tag:膽大黨
+id:11156 name:透明怪獸 attribute:木 race:獸類 star:6 first_tag:膽大黨
 id:11157 name:關東煮 attribute:水 race:強化素材 star:6 first_tag:膽大黨
+id:11158 name:相守心契 ‧ 曼陀羅 attribute:水 race:妖精類 star:6 first_tag:唯美白紗
+id:11159 name:純白誓語 ‧ 莉莉絲 attribute:火 race:機械族 star:6 first_tag:唯美白紗
+id:11160 name:愛語彩窗 ‧ 艾莉亞 attribute:木 race:人類 star:6 first_tag:唯美白紗
+id:11161 name:錦鯉良緣 ‧ 軒轅 attribute:光 race:龍類 star:6 first_tag:唯美白紗
+id:11162 name:瘋癲愛意 ‧ 莫比烏斯 attribute:暗 race:魔族 star:6 first_tag:唯美白紗
+id:11163 name:美味毒蜜 ‧ 貝莉 attribute:暗 race:魔族 star:6 first_tag:唯美白紗
+id:11164 name:魁梧花使 ‧ 李蓮英 attribute:木 race:人類 star:6 first_tag:唯美白紗
+id:11165 name:愛的奏鳴 ‧ 莫札特 attribute:水 race:神族 star:6 first_tag:唯美白紗
+id:11166 name:誓諾主祭 ‧ 司路域 attribute:光 race:人類 star:7 first_tag:唯美白紗
+id:11167 name:妙手回春 ‧ 華生 attribute:火 race:神族 star:6 first_tag:王國之謎
