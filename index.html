@@ -214,7 +214,17 @@
         .flash-error { animation: flashR 0.4s; }
         @keyframes flashG { 0% { background-color: rgba(76, 175, 80, 0.3); } 100% { background-color: transparent; } }
         @keyframes flashR { 0% { background-color: rgba(255, 82, 82, 0.3); } 100% { background-color: transparent; } }
-
+        
+        /* =========================================
+           手機版專屬樣式 (寬度小於 768px 時生效) 
+           ========================================= */
+        @media (max-width: 768px) {
+            /* 縮小圖片顯示區域的高度 */
+            .image-container {
+                height: 280px;
+                margin-bottom: 15px;
+            }
+        }
 
         #mainTitle {
             font-size: 26px;      /* 這裡是文字大小，數字越大字越大 */
@@ -525,7 +535,6 @@
             dom.imageContainerBlock.style.display = 'none';
             dom.infoModeContainer.style.display = 'block';
             dom.infoTableBody.innerHTML = '';
-            dom.guessInput.focus();
             return; 
         }
 
@@ -558,7 +567,6 @@
             };
             dom.colorImage.onerror = pickRandomCard;
         }
-        dom.guessInput.focus();
     }
 
     function setupVerticalTiles() { 
@@ -665,7 +673,6 @@
             dom.message.innerText = '❌ 猜錯了！';
             addHistoryRecord(guessedCard, false);
             dom.guessInput.value = '';
-            dom.guessInput.focus();
         }
     }
 
@@ -689,7 +696,6 @@
         dom.message.innerText = msg;
         dom.actionButtons.style.display = 'none';
         dom.nextBtn.style.display = 'block';
-        dom.nextBtn.focus();
     }
 
     function applyZoom() {
