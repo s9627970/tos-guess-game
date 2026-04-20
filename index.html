@@ -157,8 +157,12 @@
 
         /* 資訊猜卡表格樣式 */
         #infoModeContainer { display: none; width: 100%; margin-bottom: 20px; max-height: 500px; overflow-y: auto; }
-        .info-table { width: 100%; border-collapse: separate; border-spacing: 5px 8px; font-size: 14px; }
-        .info-table th { color: #aaa; font-weight: normal; padding-bottom: 5px; }
+        .info-table { width: 100%; border-collapse: separate; border-spacing: 5px 8px; font-size: 10px; }
+        .info-table th { 
+            color: #aaa; 
+            font-weight: normal; 
+            padding-bottom: 5px; 
+        }
         .info-table td { 
             padding: 12px 5px; 
             text-align: center; 
@@ -350,7 +354,7 @@
     let isDataLoaded = false;
     let skipCount = 0;
 
-    const initialZoom = 8.0, zoomStep = 1.3;
+    const initialZoom = 8.0, zoomStep = 2;
     let currentZoom = initialZoom;
     let focusX = 50, focusY = 50;
 
@@ -480,7 +484,7 @@
         } else if (selectedPlayType === 'silhouette') {
             dom.ruleDescription.innerHTML = timeStr + "圖片分六格，初始隨機開一格。<br>猜錯扣 5 分並隨機增開一格。";
         } else if (selectedPlayType === 'info') {
-            dom.ruleDescription.innerHTML = timeStr + "根據各項資訊縮小範圍。<br>格子的顏色會告訴你該項目是否與正確答案相符！<br>題庫為近一年的卡。";
+            dom.ruleDescription.innerHTML = timeStr + "根據各項資訊縮小範圍。<br>格子顏色會告訴你該項目是否與正確答案相符！<br>題庫為近一年的卡。";
         }
 
         dom.startOverlay.style.display = 'flex';
