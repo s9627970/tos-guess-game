@@ -309,7 +309,7 @@
 
         <div style="margin-top: 25px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 18px;">
             <label class="switch">
-                <input type="checkbox" id="collabToggle">
+                <input type="checkbox" id="collabToggle" checked>
                 <span class="slider round"></span>
             </label>
             <span>包含合作角色</span>
@@ -469,12 +469,14 @@
         const btns = dom.modeSelectionOverlay.querySelectorAll('button');
         btns.forEach(b => b.disabled = true);
 
-        // 新增：取得開關狀態並決定檔名
+        // --- 修正邏輯：取得開關狀態並決定檔名 ---
         const includeCollab = document.getElementById('collabToggle').checked;
-        const fileName = includeCollab ? 'card_name_filtered.txt' : 'card_name.txt';
+        
+        // 如果打開(true) -> 讀取完整版 card_name.txt
+        // 如果關閉(false) -> 讀取過濾版 card_name_filtered.txt
+        const fileName = includeCollab ? 'card_name.txt' : 'card_name_filtered.txt';
 
         try {
-            // 修改：使用動態變數 fileName
             const response = await fetch(fileName + '?t=' + new Date().getTime());
             if (!response.ok) throw new Error("檔案讀取失敗");
             const text = await response.text();
