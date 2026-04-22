@@ -79,6 +79,48 @@
         }
         .start-btn:hover:not(:disabled) { transform: scale(1.05); filter: brightness(1.1); }
         .start-btn:disabled { background: #555; cursor: not-allowed; opacity: 0.7; }
+        
+        /* Toggle Switch 樣式 */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+        }
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #555;
+            transition: .4s;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+        }
+        input:checked + .slider {
+            background-color: var(--success-green);
+        }
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+        .slider.round {
+            border-radius: 28px;
+        }
+        .slider.round:before {
+            border-radius: 50%;
+        }
 
         .mode-container { display: flex; gap: 15px; justify-content: center; margin-top: 20px; }
         .mode-btn {
@@ -264,6 +306,15 @@
             <button class="start-btn mode-btn" style="background: var(--primary-blue); color: #1e1e2f;" onclick="selectMode('all')">全部題庫</button>
             <button class="start-btn mode-btn" style="background: #ff9800;" onclick="selectMode('recent')">新卡題庫</button>
         </div>
+
+        <div style="margin-top: 25px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 18px;">
+            <label class="switch">
+                <input type="checkbox" id="collabToggle">
+                <span class="slider round"></span>
+            </label>
+            <span>包含合作角色</span>
+        </div>
+
         <p id="loadStatusText" style="margin-top:20px; color:#aaa; font-size:14px;"></p>
     </div>
 </div>
@@ -418,8 +469,13 @@
         const btns = dom.modeSelectionOverlay.querySelectorAll('button');
         btns.forEach(b => b.disabled = true);
 
+        // 新增：取得開關狀態並決定檔名
+        const includeCollab = document.getElementById('collabToggle').checked;
+        const fileName = includeCollab ? 'card_name_filtered.txt' : 'card_name.txt';
+
         try {
-            const response = await fetch('card_name.txt?t=' + new Date().getTime());
+            // 修改：使用動態變數 fileName
+            const response = await fetch(fileName + '?t=' + new Date().getTime());
             if (!response.ok) throw new Error("檔案讀取失敗");
             const text = await response.text();
             cardsData = [];
