@@ -284,8 +284,8 @@ id:11124 name:業報教化 ‧ 哀律 attribute:光 race:魔族 star:6 first_tag
 id:11125 name:絞斷腐障 ‧ 安息 attribute:火 race:獸類 star:6 first_tag:終焉梵域
 id:11126 name:惡果龍鳴 ‧ 般若 attribute:暗 race:龍類 star:6 first_tag:終焉梵域
 id:11127 name:諸惡行滅 ‧ 涅槃 attribute:暗 race:魔族 star:7 first_tag:終焉梵域
-id:11128 name:萬法根念 ‧ 阿賴耶識 attribute:水 race:魔族 star:7 first_tag:終焉梵域
-id:11129 name:最勝龍雷 ‧ 帝釋天 attribute:光 race:龍類 star:7 first_tag:終焉梵域
+id:11128 name:萬法根念 ‧ 阿賴耶識 attribute:水 race:魔族 star:7 first_tag:黑金
+id:11129 name:最勝龍雷 ‧ 帝釋天 attribute:光 race:龍類 star:7 first_tag:黑金
 id:11130 name:悠久繽紛 ‧ 烏瑞亞 attribute:木 race:神族 star:6 first_tag:悠久繽紛
 id:11131 name:開運祝舞 ‧ 夏彥 attribute:水 race:魔族 star:6 first_tag:地獄魔王
 id:11132 name:福燈春迎 ‧ 珂婍娜 attribute:火 race:龍類 star:6 first_tag:福燈春迎
