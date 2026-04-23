@@ -287,6 +287,7 @@
     <span id="timerText">剩餘時間：05:00</span>
     <span id="scoreText">總分：0</span>
     <span id="currentRoundScore">本題價值：50</span>
+    <span id="correctCountText">猜對總次數：0</span>
     <span id="skipCountText">跳過總次數：0</span> </div>
 </div>
 
@@ -404,6 +405,7 @@
     let gameTimer = null;
     let isDataLoaded = false;
     let skipCount = 0;
+    
 
     const initialZoom = 8.0, zoomStep = 2;
     let currentZoom = initialZoom;
@@ -430,6 +432,7 @@
         timerText: document.getElementById('timerText'),
         currentRoundScore: document.getElementById('currentRoundScore'),
         skipCountText: document.getElementById('skipCountText'),
+        correctCountText: document.getElementById('correctCountText'),
         gameTypeOverlay: document.getElementById('gameTypeOverlay'),
         modeSelectionOverlay: document.getElementById('modeSelectionOverlay'),
         timeSelectionOverlay: document.getElementById('timeSelectionOverlay'), // 新增
@@ -719,6 +722,7 @@
             flashEffect('success');
             endRound(true, `🎉 答對了！+${currentQuestionScore} 分`);
             addHistoryRecord(guessedCard, true);
+            dom.correctCountText.innerText = `猜對總次數：${correctCount}`;
         } else {
             currentQuestionScore = Math.max(0, currentQuestionScore - 5);
             flashEffect('error');
