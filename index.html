@@ -289,7 +289,7 @@
     <span id="scoreText">總分：0</span>
     <span id="currentRoundScore">本題價值：50</span>
     <span id="correctCountText">猜對總次數：0</span>
-    <span id="skipCountText">跳過總次數：0</span> </div>
+    <span id="skipCountText">跳過總次數：0</span>
 </div>
 
 <div id="gameTypeOverlay" class="overlay">
@@ -794,6 +794,8 @@
 
     dom.guessInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
+            e.preventDefault();  // 防止 Enter 鍵觸發其他網頁預設行為
+            e.stopPropagation(); // 阻止事件向上冒泡，避免瞬間觸發下一題
             const val = dom.guessInput.value.trim();
             const found = cardsData.find(c => c.name === val);
             if (found) { dom.suggestionsDropdown.style.display = 'none'; handleGuess(found); }
