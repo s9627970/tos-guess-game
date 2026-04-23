@@ -723,6 +723,7 @@
             flashEffect('success');
             endRound(true, `🎉 答對了！+${currentQuestionScore} 分`);
             addHistoryRecord(guessedCard, true);
+            dom.scoreText.innerText = `總分：${totalScore}`;
             dom.correctCountText.innerText = `猜對總次數：${correctCount}`;
         } else {
             currentQuestionScore = Math.max(0, currentQuestionScore - 5);
