@@ -798,9 +798,15 @@
     }
 
     function applyPixelBlur() {
-        const safeBlur = currentBlur < 0 ? 0 : currentBlur;
-        // 使用 CSS filter 達到模糊效果，並加上輕微的對比增強讓顏色不要太灰暗
-        dom.cardImage.style.filter = `blur(${currentBlur}px) contrast(1.2)`;
+        // 確保數值不會低於 0
+        const safeBlur = Math.max(0, currentBlur); 
+        
+        if (safeBlur === 0) {
+            // 解決 iOS 白畫面 Bug：當數值為 0 時不寫入 blur()
+            dom.cardImage.style.filter = `contrast(1.2)`;
+        } else {
+            dom.cardImage.style.filter = `blur(${safeBlur}px) contrast(1.2)`;
+        }
     }
 
     function flashEffect(type) {
