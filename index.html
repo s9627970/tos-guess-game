@@ -298,6 +298,7 @@
         <button class="start-btn" style="background: #e91e63;" onclick="selectGameType('zoom')">🔍 圖片縮放猜卡</button>
         <button class="start-btn" style="background: #9c27b0;" onclick="selectGameType('silhouette')">🎞️ 圖片剪影猜卡</button>
         <button class="start-btn" style="background: #4caf50;" onclick="selectGameType('info')">📊 卡片資訊猜卡</button>
+        <button class="start-btn" style="background: #ff5722;" onclick="selectGameType('pixel')">👾 像素模糊猜卡</button>
     </div>
 </div>
 
@@ -412,6 +413,10 @@
     let currentZoom = initialZoom;
     let focusX = 50, focusY = 50;
 
+    const initialBlur = 25; // 初始模糊度 (數值越大越模糊)
+    const blurStep = 4;     // 每次猜錯減少的模糊度
+    let currentBlur = initialBlur;
+
     const dom = {
         imageContainerBlock: document.getElementById('imageContainerBlock'),
         infoModeContainer: document.getElementById('infoModeContainer'),
@@ -464,6 +469,9 @@
         } else if (type === 'info') {
             dom.mainTitle.innerText = "神魔之塔 - 卡片資訊猜卡";
             loadMonsterList();
+        } else if (type === 'pixel') {
+            dom.mainTitle.innerText = "神魔之塔 - 像素模糊猜卡";
+            dom.modeSelectionOverlay.style.display = 'flex';
         }
     }
 
@@ -547,6 +555,8 @@
             dom.ruleDescription.innerHTML = timeStr + "圖片分六格，初始隨機開一格。<br>猜錯扣 5 分並隨機增開一格。";
         } else if (selectedPlayType === 'info') {
             dom.ruleDescription.innerHTML = timeStr + "根據各項資訊縮小範圍。<br>格子顏色會告訴你該項目是否與正確答案相符！<br>題庫為近一年的卡。";
+        } else if (selectedPlayType === 'pixel') {
+            dom.ruleDescription.innerHTML = timeStr + "圖片一開始會非常模糊。<br>每題 50 分，猜錯扣 5 分並讓圖片變清晰一點。";
         }
 
         dom.startOverlay.style.display = 'flex';
@@ -622,6 +632,17 @@
                 focusY = Math.floor(Math.random() * 40) + 30; 
                 currentZoom = initialZoom;
                 applyZoom();
+            };
+            dom.cardImage.onerror = pickRandomCard;
+        } else if (selectedPlayType === 'pixel') {
+            dom.cardImage.src = imgUrl;
+            dom.cardImage.onload = () => {
+                dom.loadingText.style.display = 'none';
+                dom.cardImage.style.display = 'block';
+                // 重置變數與樣式
+                currentBlur = initialBlur; 
+                dom.cardImage.style.transform = 'scale(1)'; // 不縮放
+                applyPixelBlur(); // 套用模糊
             };
             dom.cardImage.onerror = pickRandomCard;
         } else {
@@ -734,6 +755,9 @@
                 applyZoom();
             } else if (selectedPlayType === 'silhouette') {
                 revealRandomTile();
+            } else if (selectedPlayType === 'pixel') {
+                currentBlur = Math.max(0, currentBlur - blurStep);
+                applyPixelBlur();
             }
 
             dom.currentRoundScore.innerText = `本題價值：${currentQuestionScore}`;
@@ -758,6 +782,8 @@
             dom.loadingText.style.display = 'none';
             dom.cardImage.src = `https://d1h5mn9kk900cf.cloudfront.net/toswebsites/gallery/cards/${parseInt(currentCard.id, 10)}.jpg`;
             dom.cardImage.style.transform = 'scale(1)';
+        } else if (selectedPlayType === 'pixel') {
+            dom.cardImage.style.filter = 'none'; 
         }
 
         dom.message.className = isWin ? 'success' : 'error';
@@ -769,6 +795,11 @@
     function applyZoom() {
         dom.cardImage.style.transformOrigin = `${focusX}% ${focusY}%`;
         dom.cardImage.style.transform = `scale(${currentZoom})`;
+    }
+
+    function applyPixelBlur() {
+        // 使用 CSS filter 達到模糊效果，並加上輕微的對比增強讓顏色不要太灰暗
+        dom.cardImage.style.filter = `blur(${currentBlur}px) contrast(1.2)`;
     }
 
     function flashEffect(type) {
