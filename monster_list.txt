@@ -324,3 +324,16 @@ id:11164 name:魁梧花使 ‧ 李蓮英 attribute:木 race:人類 star:6 first_
 id:11165 name:愛的奏鳴 ‧ 莫札特 attribute:水 race:神族 star:6 first_tag:唯美白紗
 id:11166 name:誓諾主祭 ‧ 司路域 attribute:光 race:人類 star:7 first_tag:唯美白紗
 id:11167 name:妙手回春 ‧ 華生 attribute:火 race:神族 star:6 first_tag:王國之謎
+id:11168 name:轉生者 ‧ 魯迪烏斯 attribute:水 race:人類 star:6 first_tag:無職轉生
+id:11169 name:真紅的狂犬 ‧ 艾莉絲 attribute:火 race:人類 star:6 first_tag:無職轉生
+id:11170 name:青梅竹馬 ‧ 希露菲葉特 attribute:木 race:妖精類 star:6 first_tag:無職轉生
+id:11171 name:成長庇佑 ‧ 塞妮絲 attribute:光 race:人類 star:6 first_tag:無職轉生
+id:11172 name:菲托亞領地搜索團團長 ‧ 保羅 attribute:暗 race:人類 star:6 first_tag:無職轉生
+id:11173 name:水王級魔術師 ‧ 洛琪希 attribute:水 race:魔族 star:6 first_tag:無職轉生
+id:11174 name:護衛女僕 ‧ 莉莉雅 attribute:水 race:人類 star:6 first_tag:無職轉生
+id:11175 name:格雷拉特姊妹 ‧ 諾倫與愛夏 attribute:光 race:人類 star:6 first_tag:無職轉生
+id:11178 name:枕邊絮語 ‧ 洛琪希 attribute:光 race:魔族 star:7 first_tag:無職轉生
+id:11179 name:七星靜香 attribute:水 race:人類 star:6 first_tag:無職轉生
+id:11180 name:基列奴 attribute:火 race:獸類 star:6 first_tag:無職轉生
+id:11182 name:奇希莉卡 attribute:暗 race:魔族 star:6 first_tag:無職轉生
+id:11189 name:赤龍 attribute:火 race:強化素材 star:6 first_tag:無職轉生
