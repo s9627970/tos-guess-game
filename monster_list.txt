@@ -353,5 +353,6 @@ id:11193 name:漠北王裔 ‧ 札木合 attribute:暗 race:人類 star:6 first_
 id:11194 name:狼血武臣 ‧ 豁兒赤 attribute:暗 race:人類 star:6 first_tag:天之意志
 id:11195 name:古塚鎮衛 ‧ 蒼狼 attribute:水 race:獸類 star:6 first_tag:天之意志
 id:11196 name:業障咒縛 ‧ 黑巫傀儡 attribute:光 race:獸類 star:6 first_tag:天之意志
-id:11198 name:龐克序律 ‧ 梵帝岡 attribute:火 race:機械族 star:6 first_tag:塔之魔神
+id:11197 name:邪猾薩滿 ‧ 闊闊出 attribute:暗 race:妖精類 star:6 first_tag:天之意志
+id:11198 name:龐克序律 ‧ 梵帝岡 attribute:火 race:機械族 star:7 first_tag:塔之魔神
 id:11199 name:馴服獸性 ‧ 雷諾茲 attribute:木 race:獸類 star:6 first_tag:地獄魔王
