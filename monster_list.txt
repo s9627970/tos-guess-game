@@ -356,3 +356,20 @@ id:11196 name:業障咒縛 ‧ 黑巫傀儡 attribute:光 race:獸類 star:6 fir
 id:11197 name:邪猾薩滿 ‧ 闊闊出 attribute:暗 race:妖精類 star:6 first_tag:天之意志
 id:11198 name:龐克序律 ‧ 梵帝岡 attribute:火 race:機械族 star:7 first_tag:塔之魔神
 id:11199 name:馴服獸性 ‧ 雷諾茲 attribute:木 race:獸類 star:6 first_tag:地獄魔王
+id:11200 name:茉莉茶園 ‧ 莫莉安娜 attribute:火 race:人類 star:6 first_tag:茉莉茶園
+id:11201 name:司波深雪 attribute:水 race:人類 star:6 first_tag:魔法科高中的劣等生
+id:11202 name::安潔莉娜 ‧ 庫都 ‧ 希爾茲 attribute:火 race:人類 star:6 first_tag:魔法科高中的劣等生
+id:11203 name:七草真由美 attribute:木 race:人類 star:6 first_tag:魔法科高中的劣等生
+id:11204 name:司波達也 attribute:光 race:人類 star:6 first_tag:魔法科高中的劣等生
+id:11205 name:魔裝兵器 ‧ 司波達也 attribute:暗 race:人類 star:8 first_tag:魔法科高中的劣等生
+id:11206 name:櫻井水波 attribute:水 race:人類 star:6 first_tag:魔法科高中的劣等生
+id:11207 name:千葉艾莉卡 attribute:火 race:人類 star:6 first_tag:魔法科高中的劣等生
+id:11208 name:西城雷歐赫特 attribute:木 race:人類 star:6 first_tag:魔法科高中的劣等生
+id:11209 name:柴田美月 attribute:光 race:人類 star:6 first_tag:魔法科高中的劣等生
+id:11210 name:吉田幹比古 attribute:暗 race:人類 star:6 first_tag:魔法科高中的劣等生
+id:11211 name:海邊追憶 ‧ 司波深雪 attribute:水 race:人類 star:6 first_tag:魔法科高中的劣等生
+id:11212 name:魔法永契 ‧ 司波達也與司波深雪 attribute:光 race:人類 star:7 first_tag:魔法科高中的劣等生
+id:11214 name:呂剛虎 attribute:木 race:人類 star:6 first_tag:魔法科高中的劣等生
+id:11215 name:一條將輝 attribute:火 race:人類 star:7 first_tag:魔法科高中的劣等生
+id:11219 name:光井穗香 attribute:光 race:人類 star:6 first_tag:魔法科高中的劣等生
+id:11226 name:寄生人偶 attribute:木 race:強化素材 star:6 first_tag:魔法科高中的劣等生
