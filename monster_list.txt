@@ -369,7 +369,11 @@ id:11209 name:柴田美月 attribute:光 race:人類 star:6 first_tag:魔法科�
 id:11210 name:吉田幹比古 attribute:暗 race:人類 star:6 first_tag:魔法科高中的劣等生
 id:11211 name:海邊追憶 ‧ 司波深雪 attribute:水 race:人類 star:6 first_tag:魔法科高中的劣等生
 id:11212 name:魔法永契 ‧ 司波達也與司波深雪 attribute:光 race:人類 star:7 first_tag:魔法科高中的劣等生
+id:11213 name:九重八雲 attribute:光 race:人類 star:6 first_tag:魔法科高中的劣等生
 id:11214 name:呂剛虎 attribute:木 race:人類 star:6 first_tag:魔法科高中的劣等生
 id:11215 name:一條將輝 attribute:火 race:人類 star:7 first_tag:魔法科高中的劣等生
+id:11216 name:十文字克人 attribute:木 race:人類 star:6 first_tag:魔法科高中的劣等生
+id:11217 name:Stars總隊長 ‧ 安吉 ‧ 天狼星 attribute:火 race:人類 star:6 first_tag:魔法科高中的劣等生
+id:11218 name:黑羽亞夜子與黑羽文彌 attribute:暗 race:人類 star:6 first_tag:魔法科高中的劣等生
 id:11219 name:光井穗香 attribute:光 race:人類 star:6 first_tag:魔法科高中的劣等生
 id:11226 name:寄生人偶 attribute:木 race:強化素材 star:6 first_tag:魔法科高中的劣等生
