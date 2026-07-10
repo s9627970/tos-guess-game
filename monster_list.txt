@@ -379,4 +379,7 @@ id:11219 name:光井穗香 attribute:光 race:人類 star:6 first_tag:魔法科�
 id:11220 name:周公瑾 attribute:暗 race:人類 star:7 first_tag:魔法科高中的劣等生
 id:11221 name:九島光宣 attribute:光 race:人類 star:6 first_tag:魔法科高中的劣等生
 id:11222 name:北山雫 attribute:火 race:人類 star:6 first_tag:魔法科高中的劣等生
+id:11223 name:新發田勝成與堤琴鳴 attribute:木 race:人類 star:6 first_tag:魔法科高中的劣等生
+id:11224 name:津久葉夕歌 attribute:暗 race:人類 star:6 first_tag:魔法科高中的劣等生
+id:11225 name:四葉真夜 attribute:暗 race:人類 star:7 first_tag:魔法科高中的劣等生
 id:11226 name:寄生人偶 attribute:木 race:強化素材 star:6 first_tag:魔法科高中的劣等生
