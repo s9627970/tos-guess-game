@@ -395,6 +395,10 @@ id:11235 name:提燈指迷 ‧ 安妮特 attribute:暗 race:神族 star:5 first_
 id:11236 name:柱石圍守 ‧ 格蘭 attribute:木 race:神族 star:5 first_tag:十三巫誓
 id:11237 name:悲憫渡厄 ‧ 撒哈拉 attribute:光 race:神族 star:7 first_tag:十三巫誓
 id:11238 name:魔軀侵凌 ‧ 異化魔女 attribute:暗 race:魔族 star:6 first_tag:十三巫誓
+id:11239 name:心源質變 ‧ 畸化魔女 attribute:火 race:魔族 star:6 first_tag:十三巫誓
 id:11240 name:幻惑百相 ‧ 敦煌 attribute:光 race:龍類 star:7 first_tag:十三巫誓
 id:11241 name:愛的大炮 ‧ 蒙大拿 attribute:水 race:機械族 star:6 first_tag:塔之魔神
 id:11242 name:淵流伏擊 ‧ 魚怪 attribute:水 race:妖精類 star:6 first_tag:淵流伏擊
+id:11243 name:燃志貫穿 ‧ 香格里拉 attribute:火 race:妖精類 star:6 first_tag:燃志貫穿
+id:11244 name:魔祭授途 ‧ 司路域 attribute:木 race:人類 star:8 first_tag:黑金
+id:11245 name:續命禁咒 ‧ 司路域 attribute:暗 race:人類 star:8 first_tag:黑金
