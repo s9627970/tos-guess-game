@@ -407,3 +407,6 @@ id:11247 name:無垠星河 ‧ 圖靈與百慕達 attribute:木 race:機械族 s
 id:11248 name:機城御廚 ‧ 古嚕 attribute:暗 race:機械族 star:6 first_tag:超限科技
 id:11249 name:音符編織者 · 阿蛋 attribute:光 race:機械族 star:6 first_tag:超限科技
 id:11250 name:侵染之種 ‧ 裂核機孢 attribute:水 race:機械族 star:7 first_tag:超限科技
+id:11251 name:方尖匠王 ‧ 克希德 attribute:火 race:魔族 star:6 first_tag:超限科技
+id:11252 name:銀庭總管 ‧ 海柔兒 attribute:木 race:機械族 star:6 first_tag:超限科技
+id:11254 name:武研助手 ‧ 瑪艾塔 attribute:木 race:獸類 star:7 first_tag:超限科技
