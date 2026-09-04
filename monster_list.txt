@@ -410,6 +410,10 @@ id:11250 name:侵染之種 ‧ 裂核機孢 attribute:水 race:機械族 star:7 
 id:11251 name:方尖匠王 ‧ 克希德 attribute:火 race:魔族 star:6 first_tag:超限科技
 id:11252 name:銀庭總管 ‧ 海柔兒 attribute:木 race:機械族 star:6 first_tag:超限科技
 id:11253 name:疾馳幻輪 ‧ 飛輪 attribute:光 race:機械族 star:6 first_tag:超限科技
-id:11254 name:武研助手 ‧ 瑪艾塔 attribute:木 race:獸類 star:7 first_tag:超限科技
+id:11254 name:武研助手 ‧ 瑪艾塔 attribute:木 race:人類 star:6 first_tag:超限科技
+id:11255 name:萌熊隊長 ‧ 熊熊 attribute:暗 race:獸類 star:6 first_tag:超限科技
+id:11256 name:運籌帷幄 ‧ 斯洛普 attribute:木 race:獸類 star:7 first_tag:超限科技
 id:11257 name:深空異種 ‧ 主核機孢 attribute:火 race:機械族 star:7 first_tag:超限科技
 id:11259 name:深空異種 ‧ 主核機孢 attribute:光 race:妖精類 star:6 first_tag:萬千心界
+id:11260 name:獸道獨行 ‧ 凱撒 attribute:水 race:獸類 star:8 first_tag:黑金
+id:11261 name:弒序絕裁 ‧ 凱撒 attribute:水 race:獸類 star:8 first_tag:黑金
