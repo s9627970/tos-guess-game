@@ -417,3 +417,17 @@ id:11257 name:深空異種 ‧ 主核機孢 attribute:火 race:機械族 star:7 
 id:11259 name:深空異種 ‧ 主核機孢 attribute:光 race:妖精類 star:6 first_tag:萬千心界
 id:11260 name:獸道獨行 ‧ 凱撒 attribute:水 race:獸類 star:8 first_tag:黑金
 id:11261 name:弒序絕裁 ‧ 凱撒 attribute:水 race:獸類 star:8 first_tag:黑金
+id:11262 name:海馬瀨人＆青眼白龍 attribute:水 race:龍類 star:6 first_tag:遊戲王
+id:11263 name:城之內克也＆真紅眼黑龍 attribute:火 race:龍類 star:6 first_tag:遊戲王
+id:11264 name:孔雀舞＆神鷹女郎三姐妹 attribute:木 race:獸類 star:6 first_tag:遊戲王
+id:11265 name:武藤遊戲＆破壞龍鋼多拉 attribute:暗 race:龍類 star:6 first_tag:遊戲王
+id:11266 name:闇遊戲＆黑魔導 attribute:暗 race:魔族 star:6 first_tag:遊戲王
+id:11267 name:伊西絲 ‧ 伊修達爾 attribute:水 race:人類 star:6 first_tag:遊戲王
+id:11268 name:闇獏良＆暗黑人偶 ‧ 妮可羅菲婭 attribute:暗 race:魔族 star:6 first_tag:遊戲王
+id:11269 name:青眼究極龍 attribute:水 race:龍類 star:6 first_tag:遊戲王
+id:11274 name:闇遊戲＆三幻神 attribute:暗 race:神族 star:8 first_tag:遊戲王
+id:11275 name:真崎杏子＆黑魔導女孩 attribute:光 race:魔族 star:6 first_tag:遊戲王
+id:11276 name:盜賊基斯＆左輪手槍龍 attribute:暗 race:龍類 star:6 first_tag:遊戲王
+id:11278 name:貝卡斯 ‧ J ‧ 克羅佛多＆千眼納祭魔 attribute:暗 race:魔族 star:6 first_tag:遊戲王
+id:11279 name:昆蟲流羽蛾＆昆蟲女王 attribute:木 race:妖精類 star:6 first_tag:遊戲王
+id:11287 name:栗子球 attribute:木 race:強化素材 star:6 first_tag:遊戲王
