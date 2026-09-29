@@ -402,7 +402,7 @@ id:11242 name:淵流伏擊 ‧ 魚怪 attribute:水 race:妖精類 star:6 first_
 id:11243 name:燃志貫穿 ‧ 香格里拉 attribute:火 race:妖精類 star:6 first_tag:燃志貫穿
 id:11244 name:魔祭授途 ‧ 司路域 attribute:木 race:人類 star:8 first_tag:黑金
 id:11245 name:續命禁咒 ‧ 司路域 attribute:暗 race:人類 star:8 first_tag:黑金
-id:11246 name:指引領導 ‧ 蕾茵 attribute:水ˇ race:獸類 star:6 first_tag:超限科技
+id:11246 name:指引領導 ‧ 蕾茵 attribute:水 race:獸類 star:6 first_tag:超限科技
 id:11247 name:無垠星河 ‧ 圖靈與百慕達 attribute:木 race:機械族 star:8 first_tag:黑金
 id:11248 name:機城御廚 ‧ 古嚕 attribute:暗 race:機械族 star:6 first_tag:超限科技
 id:11249 name:音符編織者 · 阿蛋 attribute:光 race:機械族 star:6 first_tag:超限科技
@@ -425,9 +425,19 @@ id:11266 name:闇遊戲＆黑魔導 attribute:暗 race:魔族 star:6 first_tag:�
 id:11267 name:伊西絲 ‧ 伊修達爾 attribute:水 race:人類 star:6 first_tag:遊戲王
 id:11268 name:闇獏良＆暗黑人偶 ‧ 妮可羅菲婭 attribute:暗 race:魔族 star:6 first_tag:遊戲王
 id:11269 name:青眼究極龍 attribute:水 race:龍類 star:6 first_tag:遊戲王
+id:11270 name:武藤遊戲＆沉默魔術師 Lv8 attribute:光 race:魔族 star:7 first_tag:遊戲王
+id:11271 name:闇遊戲＆歐西里斯的天空龍 attribute:火 race:神族 star:7 first_tag:遊戲王
+id:11272 name:海馬瀨人＆歐貝利斯克的巨神兵 attribute:水 race:神族 star:7 first_tag:遊戲王
+id:11273 name:城之內克也＆閃電之戰士 吉爾福德 attribute:光 race:人類 star:7 first_tag:遊戲王
 id:11274 name:闇遊戲＆三幻神 attribute:暗 race:神族 star:8 first_tag:遊戲王
 id:11275 name:真崎杏子＆黑魔導女孩 attribute:光 race:魔族 star:6 first_tag:遊戲王
 id:11276 name:盜賊基斯＆左輪手槍龍 attribute:暗 race:龍類 star:6 first_tag:遊戲王
+id:11277 name:被封印的艾克佐迪亞 attribute:光 race:神族 star:7 first_tag:遊戲王
 id:11278 name:貝卡斯 ‧ J ‧ 克羅佛多＆千眼納祭魔 attribute:暗 race:魔族 star:6 first_tag:遊戲王
 id:11279 name:昆蟲流羽蛾＆昆蟲女王 attribute:木 race:妖精類 star:6 first_tag:遊戲王
+id:11280 name:梶木漁太＆傳說的漁人 attribute:水 race:人類 star:6 first_tag:遊戲王
+id:11281 name:超能絽場＆⼈造⼈索加 attribute:木 race:機械族 star:6 first_tag:遊戲王
+id:11282 name:潘朵拉＆黑魔導 attribute:暗 race:魔族 star:6 first_tag:遊戲王
+id:11283 name:光與闇之假面＆假面魔獸 死亡護法師 attribute:光 race:魔族 star:6 first_tag:遊戲王
+id:11284 name:利希德＆聖獸 塞爾凱特 attribute:火 race:獸類 star:6 first_tag:遊戲王
 id:11287 name:栗子球 attribute:木 race:強化素材 star:6 first_tag:遊戲王
