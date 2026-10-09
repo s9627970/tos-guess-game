@@ -443,3 +443,13 @@ id:11284 name:利希德＆聖獸 塞爾凱特 attribute:火 race:獸類 star:6 f
 id:11285 name:闇馬利克＆太陽神之翼神龍 attribute:光 race:神族 star:7 first_tag:遊戲王
 id:11286 name:亞圖姆 attribute:光 race:神族 star:7 first_tag:遊戲王
 id:11287 name:栗子球 attribute:木 race:強化素材 star:6 first_tag:遊戲王
+id:11288 name:時梯逆轉 ‧ 翡冷翠 attribute:水 race:人類 star:6 first_tag:十三巫誓
+id:11289 name:護世熾盾 ‧ 阿爾卑斯 attribute:火 race:人類 star:6 first_tag:十三巫誓
+id:11290 name:莽林眷獸 ‧ 月爪 attribute:木 race:獸類 star:6 first_tag:十三巫誓
+id:11291 name:迷途羔犢 ‧ 依蓓兒 attribute:光 race:人類 star:6 first_tag:十三巫誓
+id:11292 name:金羽傲鷲 ‧ 銳盾 attribute:暗 race:獸類 star:6 first_tag:十三巫誓
+id:11293 name:織光羊蛛 ‧ 綿綿 attribute:光 race:妖精類 star:6 first_tag:十三巫誓
+id:11294 name:透鏡精靈 attribute:水 race:強化素材 star:6 first_tag:十三巫誓
+id:11295 name:無窮貪噬 ‧ 依蓓兒 attribute:暗 race:人類 star:6 first_tag:十三巫誓
+id:11296 name:魔森掠食者 ‧ 噩獸 attribute:暗 race:獸類 star:6 first_tag:十三巫誓
+id:11297 name:百械重組 ‧ 艾德里安 attribute:水 race:人類 star:5 first_tag:十三巫誓
