@@ -453,3 +453,9 @@ id:11294 name:透鏡精靈 attribute:水 race:強化素材 star:6 first_tag:十�
 id:11295 name:無窮貪噬 ‧ 依蓓兒 attribute:暗 race:人類 star:6 first_tag:十三巫誓
 id:11296 name:魔森掠食者 ‧ 噩獸 attribute:暗 race:獸類 star:6 first_tag:十三巫誓
 id:11297 name:百械重組 ‧ 艾德里安 attribute:水 race:人類 star:5 first_tag:十三巫誓
+id:11298 name:蠱惑鴉使 ‧ 亞爾文 attribute:火 race:妖精類 star:6 first_tag:十三巫誓
+id:11299 name:築夢心芽 ‧ 珊達 attribute:木 race:人類 star:6 first_tag:十三巫誓
+id:11300 name:瑰艷館主 ‧ 羅潔 attribute:火 race:人類 star:5 first_tag:十三巫誓
+id:11301 name:常理之外 ‧ 界隙異象 attribute:光 race:妖精類 star:6 first_tag:十三巫誓
+id:11303 name:沐恩穹林 ‧ 烏魯木齊 attribute:木 race:人類 star:7 first_tag:十三巫誓
+id:11304 name:宙域哨戒 ‧ 新罕布夏 attribute:火 race:機械族 star:6 first_tag:討伐戰
